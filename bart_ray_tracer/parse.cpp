@@ -301,6 +301,7 @@ static void viAddExtendedMaterial(vec3f amb, vec3f dif,vec3f spc, float phong_po
 	rawMaterial.shine = phong_pow;
 	rawMaterial.T = t;
 	rawMaterial.ior = ior;
+	// then parse mesh, bind material with mesh.
 }
 
 static void viAddMaterial(vec3f col,float kd,float ks, float phong_pow,float t,float ior) {}
@@ -483,12 +484,19 @@ Format:
 static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, unsigned int *vertexIndex, int ntris) {
 	assert(verts != NULL && nverts >= 3);
 	/*
+	 * First do transformation to vertecies.
 	 * Generate triangles and add to scene.
 	 */
 	if (norms) {}
 
 	Mesh* mesh = new Mesh(nverts, verts);
+	TransformHierarchy *t_top = transformHierarchy.top();
+	if (t_top != NULL) {
+		t_top.mesh_ptr = mesh;
+	}
 	mesh->material = rawMaterial;
+	mesh->setTransforHierarchy(t_top);
+
 	for (int i = 0; i < ntris; ++i) {
 		Triangle* tri = new Triangle(mesh);
 		tri->setVertexIndex(vertexIndex[i*3], vertexIndex[i*3+1], vertexIndex[i*3+2]);

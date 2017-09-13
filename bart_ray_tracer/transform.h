@@ -10,11 +10,21 @@
 
 class TransformHierarchy {
 public:
-    bool is_static;
-    Matrix4x4 transformMatrix;
-    std::vector<TransformHierarchy*> children;
+    bool _is_static;
+    Matrix4x4 _transformMatrix;
+    TransformHierarchy *_parent;
+    Mesh *_mesh;
+    std::vector<TransformHierarchy*> _children;
 
-    TransformHierarchy(bool is_s) : is_static(is_s) {}
+    TransformHierarchy(bool is_s) : _is_static(is_s) {
+        _transformMatrix = Matrix4x4();
+        _parent = nullptr; _mesh = nullptr;
+    }
+
+    void addChild(TransformHierarchy* t) {
+        _children.push_back(t);
+        t->_parent = this;
+    }
 };
 
 #endif //BART_RAY_TRACER_TRANSFORM_H

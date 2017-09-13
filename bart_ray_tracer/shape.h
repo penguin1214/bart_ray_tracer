@@ -90,7 +90,7 @@ public:
 
 inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 	/* TODO: Moller-Trumbore */
-	vec3f* verts = mesh_ptr->verts;
+	vec3f* verts = mesh_ptr->_verts_world;
 	float eps = 1e-4;   // less than 1e-4, then
 
 	vec3f v0 = verts[vertexIndex[0]];
