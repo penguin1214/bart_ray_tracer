@@ -107,8 +107,8 @@ static void parseComment(FILE *f)
   requirement is so that NFF files can be used by hidden surface machines).
 ----------------------------------------------------------------------*/
 static void viInitViewpoint(vec3f from, vec3f at, vec3f up, float fov, float hither, int resx, int resy) {
-	rayTracer->camera->film->setSize(resx, resy);
-	rayTracer->camera->setCamParam(from, at, up, fov);
+	rayTracer->scene->camera->film->setSize(resx, resy);
+	rayTracer->scene->camera->setCamParam(from, at, up, fov);
 }
 
 static void parseViewpoint(FILE *fp)

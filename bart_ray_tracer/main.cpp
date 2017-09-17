@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
 		std::cerr << argv[0] << " <file_name>." << std::endl;
 		return -1;
 	}*/
-	std::string str_filename = "kitchen/kitchen.aff";
+	std::string str_filename = "kitchen/test.aff";
 	char filename[1024];
 	strncpy(filename, str_filename.c_str(), sizeof(filename));
 	filename[sizeof(filename) - 1] = 0;

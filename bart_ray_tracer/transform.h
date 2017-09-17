@@ -6,6 +6,7 @@
 #define BART_RAY_TRACER_TRANSFORM_H
 
 #include <vector>
+#include <stack>
 #include "matrix4x4.h"
 
 class Mesh;
@@ -29,6 +30,6 @@ public:
     }
 };
 
-extern std::stack<TransformHierarchy* >transformHierarchy;
+extern std::stack<TransformHierarchy*> transformHierarchy;
 
 #endif //BART_RAY_TRACER_TRANSFORM_H

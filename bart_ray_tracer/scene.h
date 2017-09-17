@@ -6,18 +6,19 @@
 #define BART_RAY_TRACER_SCENE_H
 
 #include <vector>
+#include <algorithm>
+#include <cmath>
 #include "shape.h"
 #include "light.h"
 #include "camera.h"
 #include "vec3f.h"
 #include "animation.h"
 
-vec3f reflect() {
-
-}
+vec3f reflect(const vec3f &normal, const vec3f &incident);
 
 class Scene {
 public:
+	Camera *camera;
 	std::vector<Shape*> shapes;
 	std::vector<Light*> lights;
 	vec3f background;
@@ -26,6 +27,7 @@ public:
 
 	Scene() {
 		gAnimations = NULL;
+		camera = new Camera();
 		background = vec3f(0.0);
 		max_depth = 0;
 	}
@@ -61,7 +63,10 @@ public:
 		}
 
 		// specular
-		Ray view_ray()
+		vec3f v_view = unit(camera->at - record.p);
+		vec3f v_reflect = unit(reflect(record.norm, r.direction()));
+		tmp_cos = dot(v_reflect, v_view);
+		col += mat.specular * std::pow(std::max(float(0.0), dot(v_view, v_reflect)), 1000) * light->col;
 
 		return col;
 	}
