@@ -10,7 +10,6 @@
 #include "material.h"
 #include "mesh.h"
 
-class Mesh;
 struct HitRecord;   // forward declaration
 
 class Shape {
@@ -57,7 +56,7 @@ public:
 	inline Material material() { return mesh_ptr->material; }
 
 	void setVertexIndex(unsigned int i0, unsigned int i1, unsigned int i2) {
-		vertexIndex[0] = i0; vertexIndex[1] = i1; vertexIndex[2] = i2;
+		vertexIndex[0] = i2; vertexIndex[1] = i1; vertexIndex[2] = i0;
 	}
 };
 
@@ -93,6 +92,7 @@ inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 	vec3f* verts = mesh_ptr->_verts_world;
 	float eps = 1e-4;   // less than 1e-4, then
 
+	// clockwise
 	vec3f v0 = verts[vertexIndex[0]];
 	vec3f v1 = verts[vertexIndex[1]];
 	vec3f v2 = verts[vertexIndex[2]];
@@ -102,7 +102,7 @@ inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 	float d = dot(v0, n);
 
 	// parallel
-	if (dot(n, r.direction()) < eps) return false;
+	if (std::abs(dot(n, r.direction())) < eps) return false;
 
 	float t = - (dot(n, r.origin())+d) / dot(n, r.direction());
 	if (t<0) return false;  // behind

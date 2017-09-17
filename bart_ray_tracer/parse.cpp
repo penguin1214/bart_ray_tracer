@@ -492,10 +492,10 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, unsigned int *vert
 	Mesh* mesh = new Mesh(nverts, verts);
 	TransformHierarchy *t_top = transformHierarchy.top();
 	if (t_top != NULL) {
-		t_top.mesh_ptr = mesh;
+		t_top->_mesh = mesh;
 	}
 	mesh->material = rawMaterial;
-	mesh->setTransforHierarchy(t_top);
+	mesh->setTransformHierarchy(t_top);
 
 	for (int i = 0; i < ntris; ++i) {
 		Triangle* tri = new Triangle(mesh);
@@ -1167,14 +1167,14 @@ static void viAddStaticTransform(vec3f s,vec3f rot,float deg,vec3f trans) {
 	m *= translate(trans.e[0], trans.e[1], trans.e[2]);
 	m *= rotate(rot.e[0], rot.e[1], rot.e[2], deg);
 	m *= scale(s.e[0], s.e[1], s.e[2]);
-	new_child->transformMatrix = m;
-	rayTracer->transformHierarchy.push(new_child);
+	new_child->_transformMatrix = m;
+	transformHierarchy.push(new_child);
 }
 
 static void viAddTransform(char* name) {
 	/* TODO: transform */
 	TransformHierarchy* new_child = new TransformHierarchy(false);
-	rayTracer->transformHierarchy.push(new_child);
+	transformHierarchy.push(new_child);
 }
 
 /*----------------------------------------------------------------------

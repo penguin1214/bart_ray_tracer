@@ -1,17 +1,18 @@
-#include <iostream>
+#include <iostream>TransformHierarchy *transform
 #include "raytracer.h"
 #include "parse.h"
 
 #define MAX_DEPTH 10
 
 RayTracer* rayTracer;
+std::stack<TransformHierarchy* >transformHierarchy;
 
 int main(int argc, char** argv) {
 	/*if (argc!=2) {
 		std::cerr << argv[0] << " <file_name>." << std::endl;
 		return -1;
 	}*/
-	std::string str_filename = "test.aff";
+	std::string str_filename = "kitchen/kitchen.aff";
 	char filename[1024];
 	strncpy(filename, str_filename.c_str(), sizeof(filename));
 	filename[sizeof(filename) - 1] = 0;

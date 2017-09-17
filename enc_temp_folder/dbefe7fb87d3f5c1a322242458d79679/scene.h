@@ -12,10 +12,6 @@
 #include "vec3f.h"
 #include "animation.h"
 
-vec3f reflect() {
-
-}
-
 class Scene {
 public:
 	std::vector<Shape*> shapes;
@@ -50,7 +46,6 @@ public:
 		// ambient
 		col += lights[0]->col * mat.ambient;
 
-		// diffuse
 		Light *light = lights[1]; // diffuse
 		Ray r_scnd(record.p, unit(light->pos - record.p));
 		float tmp_cos = dot(r_scnd.direction(), record.norm);
@@ -59,9 +54,6 @@ public:
 				col += tmp_cos * mat.diffuse * light->col;
 			}
 		}
-
-		// specular
-		Ray view_ray()
 
 		return col;
 	}

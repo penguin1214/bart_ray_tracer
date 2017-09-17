@@ -8,6 +8,8 @@
 #include <vector>
 #include "matrix4x4.h"
 
+class Mesh;
+
 class TransformHierarchy {
 public:
     bool _is_static;
@@ -26,5 +28,7 @@ public:
         t->_parent = this;
     }
 };
+
+extern std::stack<TransformHierarchy* >transformHierarchy;
 
 #endif //BART_RAY_TRACER_TRANSFORM_H

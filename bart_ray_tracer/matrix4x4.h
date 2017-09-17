@@ -6,6 +6,7 @@
 #define BART_RAY_TRACER_MATRIX4X4_H
 
 #include <cstring>
+#include "vec3f.h"
 
 class Matrix4x4
 {
@@ -53,6 +54,28 @@ class Matrix4x4
 			for (int j = 0; j < 4; ++j)
 			{
 				m[i][j] = this->m[i][0] * mat.m[0][j] + this->m[i][1] * mat.m[1][j] + this->m[i][2] * mat.m[2][j] + this->m[i][3] * mat.m[3][j];
+			}
+		}
+		return *this;
+	}
+
+	
+	vec3f operator*(vec3f &v) {
+		vec3f ret;
+		ret.e[0] = v.x()*m[0][0] + v.y()*m[0][1] + v.z()*m[0][2] + m[0][3];
+		ret.e[1] = v.x()*m[1][0] + v.y()*m[1][1] + v.z()*m[1][2] + m[1][3];
+		ret.e[2] = v.x()*m[2][0] + v.y()*m[2][1] + v.z()*m[2][2] + m[2][3];
+		return ret;
+	}
+
+	Matrix4x4 operator* (Matrix4x4 &m) {
+		Matrix4x4 tmp = *this;
+		for (int i = 0; i < 4; ++i) {
+			for (int j = 0; j < 4; ++j) {
+				m[i][j] = tmp.m[i][0] * m.m[0][j]
+					+ tmp.m[i][1] * m.m[1][j]
+					+ tmp.m[i][2] * m.m[2][j]
+					+ tmp.m[i][3] * m.m[3][j];
 			}
 		}
 		return *this;

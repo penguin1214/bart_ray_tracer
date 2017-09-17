@@ -20,14 +20,13 @@ public:
 	char* filename;
 	Scene* scene;
 	Camera* camera;
-	std::stack<TransformHierarchy* >transformHierarchy;
 
 	float start_time;
 	float end_time;
 	float nframes;
 
 	RayTracer(char* f, int d) : filename(f) {
-		nsample = 1;
+		nsample = 5;
 		scene = new Scene();
 		camera = new Camera();
 		transformHierarchy.push(NULL);
@@ -48,15 +47,15 @@ public:
 		myfile << "P3\n" << camera->film->width << " " << camera->film->height << "\n255\n";
 
 		//for (int i = camera->film->height - 1; i >= 0; --i) {
-		for (int i = 0; i < camera->film->height; ++i) {
-			double count = double(i) / double(camera->film->height) * 100.0;
+		for (int j = camera->film->height; j > 0; --j) {
+			double count = (1.0 - double(j) / double(camera->film->height)) * 100.0;
 			std::cout << count << "% done" << std::endl;
-			for (int j = 0; j < camera->film->width; ++j) {
+			for (int i = 0; i < camera->film->width; ++i) {
 				vec3f col(0, 0, 0);
 				for (int s = 0; s < nsample; ++s) {
 					float random = ((double) rand() / (RAND_MAX)) + 1;
-					float u = float(j + random) / float(camera->film->width);  // u, v cord??
-					float v = float(i + random) / float(camera->film->height);
+					float u = float(i + random) / float(camera->film->width);  // u, v cord??
+					float v = float(j + random) / float(camera->film->height);
 					Ray r = camera->get_ray(u, v);
 					// trace
 					if (scene->max_depth == 0) { col += vec3f(0.0); }
