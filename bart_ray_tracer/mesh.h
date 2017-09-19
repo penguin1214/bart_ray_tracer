@@ -7,6 +7,7 @@
 
 #include <vector>
 #include "assert.h"
+#include "common.h"
 #include "vec3f.h"
 #include "material.h"
 #include "texture.h"
@@ -46,10 +47,10 @@ public:
 		_verts_world = v; _norms = n; _txts = t;
 		verts = (vec3f*)malloc(nverts * sizeof(vec3f));
 		memcpy(verts, _verts_world, nverts * sizeof(vec3f));
-		_norms = (vec3f*)malloc(nnorms * sizeof(vec3f));
+		/*_norms = (vec3f*)malloc(nnorms * sizeof(vec3f));
 		memcpy(_norms, n, nn * sizeof(vec3f));
 		_txts = (Vec2f*)malloc(ntxts * sizeof(Vec2f));
-		memcpy(_txts, t, nt * sizeof(Vec2f));
+		memcpy(_txts, t, nt * sizeof(Vec2f));*/
 		/* TODO: deep copy */
 	}
 

@@ -14,6 +14,8 @@
 #include "vec3f.h"
 #include "animation.h"
 
+typedef float Vec2f[2];	// texture
+
 vec3f reflect(const vec3f &normal, const vec3f &incident);
 
 class Scene {
@@ -35,7 +37,7 @@ public:
 	vec3f trace(Ray& r, int depth) {
 		HitRecord record;
 		if (! intersect(r, record)) {
-			return vec3f(0.05);
+			return vec3f(0.0);
 		}
 
 		vec3f col(0.0);
@@ -67,6 +69,38 @@ public:
 		vec3f v_reflect = unit(reflect(record.norm, r.direction()));
 		tmp_cos = dot(v_reflect, v_view);
 		col += mat.specular * std::pow(std::max(float(0.0), dot(v_view, v_reflect)), 1000) * light->col;
+
+		// texture
+		if (record.obj->mesh_ptr && record.obj->mesh_ptr->_txts) {
+			// has texture
+			Triangle *tri = dynamic_cast<Triangle *>(record.obj);
+			/* TODO: use world coordinate or local? */
+			vec3f A = tri->mesh_ptr->verts[tri->vertexIndex[0]];
+			vec3f B = tri->mesh_ptr->verts[tri->vertexIndex[1]]; 
+			vec3f C = tri->mesh_ptr->verts[tri->vertexIndex[2]];
+			vec3f P = record.p;
+
+			float *tA = tri->mesh_ptr->_txts[tri->txtIndex[0]];
+			float *tB = tri->mesh_ptr->_txts[tri->txtIndex[1]];
+			float *tC = tri->mesh_ptr->_txts[tri->txtIndex[2]];
+
+			float delta = 1e-4;
+			float baryA = ((B.y() - C.y())*(P.x() - C.x()) + (C.x() - B.x())*(P.y() - C.y())) / ( ((B.y()-C.y())*(A.x()-C.x())+(C.x()-B.x())*(A.y()-C.y())) + delta);
+			float baryB = ((C.y()-A.y())*(P.x()-C.x()) + (A.x()-C.x())*(P.y()-C.y())) / ( ((B.y()-C.y())*(A.x()-C.x()) + (C.x()-B.x())*(A.y()-C.y())) + delta);
+			float baryC = 1.0 - baryA - baryB;
+
+			float tP[2];
+			tP[0] = baryA*tA[0] + baryB*tB[0] + baryC*tC[0];
+			tP[1] = baryA*tA[1] + baryB*tB[1] + baryC*tC[1];
+
+			// do not interpolate now
+			int tmp_u = tP[0] * tri->mesh_ptr->texture->mWidth;
+			int tmp_v = tP[1] * tri->mesh_ptr->texture->mHeight;
+			int tmp_idx = tmp_v * tri->mesh_ptr->texture->mWidth + tmp_u;
+			col.e[0] = tri->mesh_ptr->texture->mRGB[tmp_idx + 0];
+			col.e[1] = tri->mesh_ptr->texture->mRGB[tmp_idx + 1];
+			col.e[2] = tri->mesh_ptr->texture->mRGB[tmp_idx + 2];
+		}
 
 		return col;
 	}

@@ -18,14 +18,12 @@
 #include "raytracer.h"
 #include "matrix4x4.h"
 #include "mesh.h"
+#include "common.h"
 
 #ifndef  M_PI
 #define  M_PI 3.1415926535897932384626433
 #endif
 
-typedef float Vec2f[2];
-typedef float Vec3f[3];
-typedef float Vec4f[4];
 
 #define X 0
 #define Y 1
@@ -481,17 +479,21 @@ Format:
 	[ %g %g %g %g %g %g ] <-- for total_vertices vertices
 ----------------------------------------------------------------------*/
 
-static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, Vec2f *txts, unsigned int *vertexIndex, int ntris, char *textureName) {
+static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, int nnorms, Vec2f *txts, int ntxts, unsigned int *indices, int ntris, char *textureName) {
+	/* coordinates passed to this function are all local coordinates,
+	 * transform is applied in this function.
+	 */
 	assert(verts != NULL && nverts >= 3);
 	/*
 	 * First do transformation to vertecies.
 	 * Generate triangles and add to scene.
 	 */
-	if (norms) {
+	int size = 0; int step = 1;
+	if (norms) { step++; }
+	if (txts) { step++; }
+	size = step * 3;	// num of elements for a single triangle
 
-	}
-
-	Mesh* mesh = new Mesh(nverts, verts);
+	Mesh* mesh = new Mesh(nverts, verts, nnorms, norms, ntxts, txts);
 	TransformHierarchy *t_top = transformHierarchy.top();
 	if (t_top != NULL) {
 		t_top->_mesh = mesh;
@@ -500,8 +502,21 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, Vec2f *txts, unsig
 	mesh->setTransformHierarchy(t_top);
 
 	for (int i = 0; i < ntris; ++i) {
-		Triangle* tri = new Triangle(mesh);
-		tri->setVertexIndex(vertexIndex[i*3], vertexIndex[i*3+1], vertexIndex[i*3+2]);
+		Triangle* tri = new Triangle(mesh);	// create triangle and bind mesh pointer
+
+		/* indices appear in this order: [texture] [normals] vertices. []=optional */
+		/* tri0_t0 tri0_n0 tri0_v0 ... */
+		int j = 0;
+		if (txts) {
+			// add texture index
+			tri->setTxtIndex(indices[i*size + step * 0 + j], indices[i*size + step * 1 + j], indices[i*size + step * 2 + j]);
+		j++;
+		}
+		if (norms) {
+			tri->setNormalIndex(indices[i*size + step * 0 + j], indices[i*size + step * 1 + j], indices[i*size + step * 2 + j]);
+		j++;
+		}
+		tri->setVertexIndex(indices[i*size + step * 0 + j], indices[i*size + step * 1 + j], indices[i*size + step * 2 + j]);
 
 		mesh->addTriangle(tri);
 		rayTracer->scene->addShape(tri);
@@ -529,7 +544,7 @@ static void viAddPolygon(int nverts,vec3f *verts) {
 		vertexIndex[i*3+2] = i+2;
 	}
 
-	viAddMesh(verts, nverts, NULL, vertexIndex, ntris);
+	viAddMesh(verts, nverts, NULL, NULL, NULL, NULL, vertexIndex, ntris, nullptr);
 	delete[] vertexIndex;
 }
 
@@ -1469,7 +1484,6 @@ static void getTriangles(FILE *fp,int *num_tris,unsigned int **indices,
 			if(txts) idx[i++]=t[w];
 			if(norms) idx[i++]=n[w];
 			idx[i++]=v[w];
-/*	 printf("vv: %d\n",v[w]); */
 		}
 	}
 	*indices=idx;
@@ -1517,10 +1531,41 @@ static void parseMesh(FILE *fp)
 		printf("Error: expected 'triangles' in mesh.\n");
 		exit(1);
 	}
+
+	// scale
+	if (txts) {
+		float umin = 0; float umax = 0;
+		float vmin = 0; float vmax = 0;
+		for (int i = 0; i < num_txts; i++) {
+			// u
+			if (txts[i][0] < umin) umin = txts[i][0];
+			if (txts[i][0] > umax) umax = txts[i][0];
+			//v
+			if (txts[i][1] < vmin) vmin = txts[i][1];
+			if (txts[i][1] > vmax) vmax = txts[i][1];
+		}
+
+		// scaling
+		for (int i = 0; i < num_txts; i++) {
+			txts[i][0] = (txts[i][0] - umin) / (umax - umin);
+			txts[i][1] = (txts[i][1] - vmin) / (vmax - vmin);
+		}
+
+		if (umin < 0) {
+			for (int i = 0; i < num_txts; i++) {
+				txts[i][0] -= umin;
+			}
+		}
+		if (vmin < 0) {
+			for (int i = 0; i < num_txts; i++) {
+				txts[i][0] -= umin;
+			}
+		}
+	}
 	/* TODO: add a mesh here
 	 * e.g.,viAddMesh(verts,num_verts,norms,num_norms,txts,num_txts,texturename,indices,num_tris);
 	 */
-	viAddMesh(verts, num_verts, norms, txts, indices, num_tris);
+	viAddMesh(verts, num_verts, norms, num_norms, txts, num_txts, indices, num_tris, texturename);
 }
 
 

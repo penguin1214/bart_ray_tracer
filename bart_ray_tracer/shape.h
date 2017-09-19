@@ -14,6 +14,10 @@ struct HitRecord;   // forward declaration
 
 class Shape {
 public:
+	Mesh *mesh_ptr;
+
+	Shape() { mesh_ptr = nullptr; }
+
 	virtual bool intersect(Ray& r, HitRecord& rec) {
 		std::cout << "Child intersect() is not implement." << std::endl;
 		return false;
@@ -34,19 +38,23 @@ struct HitRecord {
 
 class Triangle: public Shape {
 public:
-	Mesh* mesh_ptr;
 	unsigned int vertexIndex[3];
+	unsigned int normalIndex[3];
+	unsigned int txtIndex[3];
 
 	Triangle() {
 		for (int i = 0; i < 3; ++i) {
 			vertexIndex[i] = -1;
+			normalIndex[i] = -1;
+			txtIndex[i] = -1;
 		}
 	}
 
 	Triangle(Mesh* m) {
-		// ??!!  Triangle();
 		for (int i = 0; i < 3; ++i) {
 			vertexIndex[i] = -1;
+			normalIndex[i] = -1;
+			txtIndex[i] = -1;
 		}
 		mesh_ptr = m;
 	}
@@ -57,6 +65,14 @@ public:
 
 	void setVertexIndex(unsigned int i0, unsigned int i1, unsigned int i2) {
 		vertexIndex[0] = i2; vertexIndex[1] = i1; vertexIndex[2] = i0;
+	}
+
+	void setNormalIndex(unsigned int i0, unsigned int i1, unsigned int i2) {
+		normalIndex[0] = i2; normalIndex[1] = i1; normalIndex[2] = i0;
+	}
+
+	void setTxtIndex(unsigned int i0, unsigned int i1, unsigned int i2) {
+		txtIndex[0] = i2; txtIndex[1] = i1; txtIndex[2] = i0;
 	}
 };
 

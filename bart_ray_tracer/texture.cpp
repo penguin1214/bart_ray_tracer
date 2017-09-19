@@ -1,11 +1,6 @@
-/*----------------------------------------------------------------------
-  File:    texture.c
-  Purpose: Stuff concerning textures
-		   reads PPM files (only in P6 format, i.e., RGB binary)
-----------------------------------------------------------------------*/
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "texture.h"
 
 /* skip all rows that start with #, i.e., comments */
@@ -41,7 +36,7 @@ static void eatWhitespace(FILE *f)
  *---------
  * then follows RGBRGBRGBRGBRGB...
  */
-struct Texture *viReadPPM(char *filename)
+Texture *viReadPPM(char *filename)
 {
    FILE *f;
    char ch;
