@@ -9,6 +9,7 @@
 #include "assert.h"
 #include "vec3f.h"
 #include "material.h"
+#include "texture.h"
 #include "transform.h"
 #include "matrix4x4.h"
 
@@ -18,12 +19,13 @@ class Mesh {
 public:
 	uint32_t nverts, nnorms, ntxts;
 	bool _is_static;
-	vec3f *verts; // do not use pointer here because of the copy issue
+	vec3f *verts;
 	vec3f *_verts_world;
 	vec3f *_norms;
 	vec3f *_norms_world;
 	Vec2f *_txts;
 	Material material;
+	Texture *texture;
 	TransformHierarchy *_trans_hierarchy;
 	Matrix4x4 _trans_local_to_world;
 	Matrix4x4 _trans_local_to_world_inv;

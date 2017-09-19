@@ -491,8 +491,6 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, Vec2f *txts, unsig
 
 	}
 
-	if (txts) {}
-
 	Mesh* mesh = new Mesh(nverts, verts);
 	TransformHierarchy *t_top = transformHierarchy.top();
 	if (t_top != NULL) {
@@ -507,6 +505,11 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, Vec2f *txts, unsig
 
 		mesh->addTriangle(tri);
 		rayTracer->scene->addShape(tri);
+	}
+
+	if (txts) {
+		Texture *raw_texture = viReadPPM(textureName);
+		mesh->texture = raw_texture;
 	}
 }
 
