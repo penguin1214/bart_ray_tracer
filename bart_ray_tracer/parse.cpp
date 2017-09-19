@@ -481,13 +481,17 @@ Format:
 	[ %g %g %g %g %g %g ] <-- for total_vertices vertices
 ----------------------------------------------------------------------*/
 
-static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, unsigned int *vertexIndex, int ntris) {
+static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, Vec2f *txts, unsigned int *vertexIndex, int ntris, char *textureName) {
 	assert(verts != NULL && nverts >= 3);
 	/*
 	 * First do transformation to vertecies.
 	 * Generate triangles and add to scene.
 	 */
-	if (norms) {}
+	if (norms) {
+
+	}
+
+	if (txts) {}
 
 	Mesh* mesh = new Mesh(nverts, verts);
 	TransformHierarchy *t_top = transformHierarchy.top();
@@ -1513,7 +1517,7 @@ static void parseMesh(FILE *fp)
 	/* TODO: add a mesh here
 	 * e.g.,viAddMesh(verts,num_verts,norms,num_norms,txts,num_txts,texturename,indices,num_tris);
 	 */
-	viAddMesh(verts, num_verts, norms, indices, num_tris);
+	viAddMesh(verts, num_verts, norms, txts, indices, num_tris);
 }
 
 

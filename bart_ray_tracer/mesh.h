@@ -16,10 +16,13 @@ class Triangle;
 
 class Mesh {
 public:
-	uint32_t nverts;
+	uint32_t nverts, nnorms, ntxts;
 	bool _is_static;
 	vec3f *verts; // do not use pointer here because of the copy issue
 	vec3f *_verts_world;
+	vec3f *_norms;
+	vec3f *_norms_world;
+	Vec2f *_txts;
 	Material material;
 	TransformHierarchy *_trans_hierarchy;
 	Matrix4x4 _trans_local_to_world;
@@ -33,6 +36,19 @@ public:
 		// do deep copy
 		verts = (vec3f*)malloc(nverts * sizeof(vec3f));
 		memcpy(verts, _verts_world, nverts * sizeof(vec3f));
+	}
+
+	Mesh(uint32_t nv, vec3f *v, uint32_t nn, vec3f *n, uint32_t nt, Vec2f *t) {
+		_is_static = true;
+		nverts = nv; nnorms = nn; ntxts = nt;
+		_verts_world = v; _norms = n; _txts = t;
+		verts = (vec3f*)malloc(nverts * sizeof(vec3f));
+		memcpy(verts, _verts_world, nverts * sizeof(vec3f));
+		_norms = (vec3f*)malloc(nnorms * sizeof(vec3f));
+		memcpy(_norms, n, nn * sizeof(vec3f));
+		_txts = (Vec2f*)malloc(ntxts * sizeof(Vec2f));
+		memcpy(_txts, t, nt * sizeof(Vec2f));
+		/* TODO: deep copy */
 	}
 
 	void updateVertex() {
