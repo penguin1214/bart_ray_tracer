@@ -51,7 +51,7 @@ public:
 				vec3f col(0, 0, 0);
 				for (int s = 0; s < nsample; ++s) {
 					float random = ((double) rand() / (RAND_MAX)) + 1;
-					float u = float(i + random) / float(scene->camera->film->width);  // u, v cord??
+					float u = 1.0 - float(i + random) / float(scene->camera->film->width);  // u, v cord??
 					float v = float(j + random) / float(scene->camera->film->height);
 					Ray r = scene->camera->get_ray(u, v);
 					// trace

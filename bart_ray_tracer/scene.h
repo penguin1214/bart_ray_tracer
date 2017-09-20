@@ -85,8 +85,8 @@ public:
 			float *tC = tri->mesh_ptr->_txts[tri->txtIndex[2]];
 
 			float delta = 1e-4;
-			float baryA = ((B.y() - C.y())*(P.x() - C.x()) + (C.x() - B.x())*(P.y() - C.y())) / ( ((B.y()-C.y())*(A.x()-C.x())+(C.x()-B.x())*(A.y()-C.y())) + delta);
-			float baryB = ((C.y()-A.y())*(P.x()-C.x()) + (A.x()-C.x())*(P.y()-C.y())) / ( ((B.y()-C.y())*(A.x()-C.x()) + (C.x()-B.x())*(A.y()-C.y())) + delta);
+			float baryA = ((B.y() - C.y())*(P.x() - C.x()) + (C.x() - B.x())*(P.y() - C.y())) / ( ((B.y()-C.y())*(A.x()-C.x()) + (C.x()-B.x())*(A.y()-C.y())) + delta);
+			float baryB = ((C.y() - A.y())*(P.x() - C.x()) + (A.x() - C.x())*(P.y() - C.y())) / ( ((B.y()-C.y())*(A.x()-C.x()) + (C.x()-B.x())*(A.y()-C.y())) + delta);
 			float baryC = 1.0 - baryA - baryB;
 
 			float tP[2];
