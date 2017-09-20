@@ -641,7 +641,8 @@ Format:
 ----------------------------------------------------------------------*/
 static void parseInclude(FILE *fp)
 {
-	char* dir = "kitchen/";
+	//char* dir = "kitchen/";
+	char* dir = "";
 	char filename[100];
 	char* path;
 	FILE *ifp;

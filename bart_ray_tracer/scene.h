@@ -84,16 +84,15 @@ public:
 			float *tB = tri->mesh_ptr->_txts[tri->txtIndex[1]];
 			float *tC = tri->mesh_ptr->_txts[tri->txtIndex[2]];
 
-			float delta = 1e-4;
-			float baryA = ((B.y() - C.y())*(P.x() - C.x()) + (C.x() - B.x())*(P.y() - C.y())) / ( ((B.y()-C.y())*(A.x()-C.x()) + (C.x()-B.x())*(A.y()-C.y())) + delta);
-			float baryB = ((C.y() - A.y())*(P.x() - C.x()) + (A.x() - C.x())*(P.y() - C.y())) / ( ((B.y()-C.y())*(A.x()-C.x()) + (C.x()-B.x())*(A.y()-C.y())) + delta);
-			float baryC = 1.0 - baryA - baryB;
+			float baryA, baryB, baryC;
+			/* TODO */
+			//Triangle::barycentric(P, A, B, C, baryB, baryC, baryA);
+			Triangle::barycentric(P, A, B, C, baryA, baryB, baryC);
 
 			float tP[2];
 			tP[0] = baryA*tA[0] + baryB*tB[0] + baryC*tC[0];
 			tP[1] = baryA*tA[1] + baryB*tB[1] + baryC*tC[1];
 
-			// do not interpolate now
 			int tmp_u = tP[0] * tri->mesh_ptr->texture->mWidth;
 			int tmp_v = tP[1] * tri->mesh_ptr->texture->mHeight;
 			int tmp_idx = tmp_v * tri->mesh_ptr->texture->mWidth + tmp_u;

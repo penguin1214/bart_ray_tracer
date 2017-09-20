@@ -74,6 +74,22 @@ public:
 	void setTxtIndex(unsigned int i0, unsigned int i1, unsigned int i2) {
 		txtIndex[0] = i2; txtIndex[1] = i1; txtIndex[2] = i0;
 	}
+
+	static inline void barycentric(vec3f P, vec3f A, vec3f B, vec3f C, float &baryA, float &baryB, float &baryC) {
+		vec3f v0 = B - A, v1 = C - A, v2 = P - A;
+		float d00 = dot(v0, v0);
+		float d01 = dot(v0, v1);
+		float d11 = dot(v1, v1);
+		float d20 = dot(v2, v0);
+		float d21 = dot(v2, v1);
+		float denom = d00 * d11 - d01 * d01;
+
+		baryA = (d11 * d20 - d01 * d21) / denom;
+		baryB = (d00 * d21 - d01 * d20) / denom;
+		baryC = 1.0 - baryA - baryB;
+
+		return;
+	}
 };
 
 class Sphere: public Shape {
