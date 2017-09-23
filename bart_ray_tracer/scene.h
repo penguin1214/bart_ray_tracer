@@ -85,7 +85,7 @@ public:
 			float *tC = tri->mesh_ptr->_txts[tri->txtIndex[2]];
 
 			float baryA, baryB, baryC;
-			/* TODO */
+			/* TODO barycentric coordinates are not corresponding to original ones?? */
 			Triangle::barycentric(P, A, B, C, baryB, baryC, baryA);
 
 			float tP[2];
@@ -97,9 +97,9 @@ public:
 			int tmp_idx = tmp_v * tri->mesh_ptr->texture->mWidth + tmp_u;
 			tmp_idx *= 3;
 
-			col.e[0] = (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 0] / 255.0f;
-			col.e[1] = (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
-			col.e[2] = (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
+			col.e[0] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 0] / 255.0f;
+			col.e[1] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
+			col.e[2] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
 		}
 
 		return col;

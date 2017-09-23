@@ -1358,6 +1358,7 @@ static void parseA(FILE *f)
 		}
 
 		/* TODO: set up your globabl ambient light here using amb */
+		colorClamp(amb);
 		rayTracer->scene->addLight(new AmbientLight(amb));
 	}
 	else

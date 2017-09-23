@@ -100,6 +100,13 @@ Texture *viReadPPM(char *filename)
 			
 	  fclose(f);
 
+	  // normalize color value to [0,1]
+	  // TODO normalize cause error???
+	  /*float tmp;
+	  for (int i = 0; i < 2 * width*height; i++) {
+		  tmp = (float)tx->mRGB[i] / 255.0f;
+		  tx->mRGB[i] = (char)tmp;
+	  }*/
 	  return tx;
    }
    else
