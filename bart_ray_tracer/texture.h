@@ -16,10 +16,10 @@ public:
 	unsigned char *mRGB; /* the size is 3*mWidth*mHeight */
 
 	static inline float scale(float coord) {
-		float *nwrap = new float[1];
-		float ret = std::modf(coord, nwrap);
+		float nwrap;
+		float ret = std::modf(coord, &nwrap);
 		if (ret < 0.0) ret += 1.0;
-		if (ret == 0.0 && (int)nwrap % 2) ret = 1.0;
+		if (ret == 0.0 && (int)(nwrap) != 0) ret = 1.0;
 		return ret;
 	}
 };

@@ -92,8 +92,13 @@ public:
 			tP[0] = baryA*tA[0] + baryB*tB[0] + baryC*tC[0];
 			tP[1] = baryA*tA[1] + baryB*tB[1] + baryC*tC[1];
 
+			// scale
+			tP[0] = Texture::scale(tP[0]);
+			tP[1] = Texture::scale(tP[1]);
+
 			int tmp_u = tP[0] * tri->mesh_ptr->texture->mWidth;
 			int tmp_v = tP[1] * tri->mesh_ptr->texture->mHeight;
+
 			int tmp_idx = tmp_v * tri->mesh_ptr->texture->mWidth + tmp_u;
 			tmp_idx *= 3;
 

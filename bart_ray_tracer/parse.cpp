@@ -1358,7 +1358,7 @@ static void parseA(FILE *f)
 		}
 
 		/* TODO: set up your globabl ambient light here using amb */
-		colorClamp(amb);
+		colorNormalizeMetric(amb);
 		rayTracer->scene->addLight(new AmbientLight(amb));
 	}
 	else
@@ -1534,41 +1534,12 @@ static void parseMesh(FILE *fp)
 		exit(1);
 	}
 
-	for (int i = 0; i < num_txts; i++) {
-		txts[i][0] = Texture::scale(txts[i][0]);
-		txts[i][1] = Texture::scale(txts[i][1]);
-	}
-
-	// scale
-	//if (txts) {
-	//	float umin = 0; float umax = 0;
-	//	float vmin = 0; float vmax = 0;
-	//	for (int i = 0; i < num_txts; i++) {
-	//		// u
-	//		if (txts[i][0] < umin) umin = txts[i][0];
-	//		if (txts[i][0] > umax) umax = txts[i][0];
-	//		//v
-	//		if (txts[i][1] < vmin) vmin = txts[i][1];
-	//		if (txts[i][1] > vmax) vmax = txts[i][1];
-	//	}
-
-	//	// scaling
-	//	for (int i = 0; i < num_txts; i++) {
-	//		txts[i][0] = (txts[i][0] - umin) / (umax - umin);
-	//		txts[i][1] = (txts[i][1] - vmin) / (vmax - vmin);
-	//	}
-
-	//	if (umin < 0) {
-	//		for (int i = 0; i < num_txts; i++) {
-	//			txts[i][0] -= umin;
-	//		}
-	//	}
-	//	if (vmin < 0) {
-	//		for (int i = 0; i < num_txts; i++) {
-	//			txts[i][0] -= umin;
-	//		}
-	//	}
+	// Texture scaling CANNOT be applied here because of wrapping!
+	//for (int i = 0; i < num_txts; i++) {
+	//	txts[i][0] = Texture::scale(txts[i][0]);
+	//	txts[i][1] = Texture::scale(txts[i][1]);
 	//}
+
 	/* TODO: add a mesh here
 	 * e.g.,viAddMesh(verts,num_verts,norms,num_norms,txts,num_txts,texturename,indices,num_tris);
 	 */

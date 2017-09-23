@@ -24,7 +24,7 @@ public:
 	float nframes;
 
 	RayTracer(char* f, int d) : filename(f) {
-		nsample = 5;
+		nsample = 20;
 		scene = new Scene();
 		transformHierarchy.push(NULL);
 		scene->max_depth = d;
@@ -36,18 +36,13 @@ public:
 
 	void setFrame(int n) { nframes = n; }
 
-	void render() {
-		std::cout << "rendering... " << std::endl;
-		std::ofstream myfile;
-		myfile.open("image.ppm");
-
-		myfile << "P3\n" << scene->camera->film->width << " " << scene->camera->film->height << "\n255\n";
-
-		//for (int i = scene->camera->film->height - 1; i >= 0; --i) {
-		for (int j = scene->camera->film->height; j > 0; --j) {
+	void render(float* image) {
+		for (int j = scene->camera->film->height-1; j >= 0; --j) {
 			double count = (1.0 - double(j) / double(scene->camera->film->height)) * 100.0;
 			std::cout << count << "% done" << std::endl;
 			for (int i = 0; i < scene->camera->film->width; ++i) {
+				int index = j*scene->camera->film->width + i;
+
 				vec3f col(0, 0, 0);
 				for (int s = 0; s < nsample; ++s) {
 					float random = ((double) rand() / (RAND_MAX)) + 1;
@@ -61,14 +56,12 @@ public:
 				col /= float(nsample);
 				// gamma correct
 				col = vec3f(sqrt(col.e[0]), sqrt(col.e[1]), sqrt(col.e[2]));
-				int ir = int(255.99 * col.e[0]);  // why use 255.99?
-				int ig = int(255.99 * col.e[1]);
-				int ib = int(255.99 * col.e[2]);
-				myfile << ir << " " << ig << " " << ib << "\n";
-				// std::cout << ir << " " << ig << " " << ib << std::endl;
+
+				image[index * 3 + 0] = col.e[0];
+				image[index * 3 + 1] = col.e[1];
+				image[index * 3 + 2] = col.e[2];
 			}
 		}
-		myfile.close();
 	}
 
 //    vec3f trace(const Ray& r, std::vector<Shape* > shapes) {
@@ -80,9 +73,6 @@ public:
 //
 //        }
 //    }
-
-	/* TODO: */
-	void savePPM() {}
 };
 
 // !!! ATTENTION

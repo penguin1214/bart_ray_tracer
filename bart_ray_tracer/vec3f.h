@@ -154,7 +154,8 @@ inline std::ostream& operator<<(std::ostream& os, vec3f& v) {
 	return os;
 }
 
-inline void colorClamp(vec3f &v) {
+/* Convert value out of [0,1] to [0,1]. */
+inline void colorNormalizeMetric(vec3f &v) {
 	if (v.e[0] > 1.0f || v.e[1] > 1.0f || v.e[2] > 1.0f) {
 		v /= 255.0f;
 	}
