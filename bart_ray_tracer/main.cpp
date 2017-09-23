@@ -41,7 +41,15 @@ int main(int argc, char** argv) {
 
 	rayTracer->render();
 
-	int t;
-	std::cin >> t;
+	//char *fname = "texture.ppm";
+	//float *t = new float[4*3];
+	//t[0] = 1.0f; t[1] = 1.0f; t[2] = 1.0f;
+	//t[3] = 0.1f; t[4] = 0.1f; t[5] = 0.5f;
+	//t[6] = 1.0f; t[7] = 1.0f; t[8] = 1.0f;
+	//t[9] = 0.1f; t[10] = 0.1f; t[11] = 0.5f;
+	//writePPMBin(t, 2, 2, fname);
+
+	int tm;
+	std::cin >> tm;
 	return 0;
 }

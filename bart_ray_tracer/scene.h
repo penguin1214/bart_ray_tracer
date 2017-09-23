@@ -86,8 +86,7 @@ public:
 
 			float baryA, baryB, baryC;
 			/* TODO */
-			//Triangle::barycentric(P, A, B, C, baryB, baryC, baryA);
-			Triangle::barycentric(P, A, B, C, baryA, baryB, baryC);
+			Triangle::barycentric(P, A, B, C, baryB, baryC, baryA);
 
 			float tP[2];
 			tP[0] = baryA*tA[0] + baryB*tB[0] + baryC*tC[0];
@@ -96,9 +95,11 @@ public:
 			int tmp_u = tP[0] * tri->mesh_ptr->texture->mWidth;
 			int tmp_v = tP[1] * tri->mesh_ptr->texture->mHeight;
 			int tmp_idx = tmp_v * tri->mesh_ptr->texture->mWidth + tmp_u;
-			col.e[0] = tri->mesh_ptr->texture->mRGB[tmp_idx + 0];
-			col.e[1] = tri->mesh_ptr->texture->mRGB[tmp_idx + 1];
-			col.e[2] = tri->mesh_ptr->texture->mRGB[tmp_idx + 2];
+			tmp_idx *= 3;
+
+			col.e[0] = (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 0] / 255.0f;
+			col.e[1] = (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
+			col.e[2] = (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
 		}
 
 		return col;
