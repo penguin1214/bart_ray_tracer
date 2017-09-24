@@ -19,7 +19,7 @@ public:
 	vec3f right;
 	float vfov; // vertical field of view
 	float near_plane_distance;
-	vec3f lower_left_corner;
+	vec3f up_left_corner;
 	vec3f horizontal;
 	vec3f vertical;
 	Film* film;
@@ -38,7 +38,7 @@ public:
 		float theta = deg2rad(vfov);
 		near_plane_distance = h / (2 * tan(theta / 2));
 
-		lower_left_corner = from + near_plane_distance*forward - film->width / 2 * right - film->height / 2 * up;
+		up_left_corner = from + near_plane_distance*forward - film->width / 2 * right + film->height / 2 * up;
 		horizontal = film->width*right;
 		vertical = film->height*up;
 	}
@@ -52,7 +52,7 @@ public:
 
 		float theta = deg2rad(vfov);
 		near_plane_distance = film->height / (2 * tan(theta / 2));
-		lower_left_corner = from + near_plane_distance*forward - film->width / 2 * right - film->height / 2 * up;
+		up_left_corner = from + near_plane_distance*forward - film->width / 2 * right + film->height / 2 * up;
 		horizontal = film->width*right;
 		vertical = film->height*up;
 	}
@@ -60,7 +60,7 @@ public:
 	Ray get_ray(float u, float v) {
 		//std::cout << "from: " << from << std::endl;
 		//std::cout << "cursor: " << lower_left_corner + u*horizontal + v*vertical;
-		return Ray(from, unit(lower_left_corner+u*horizontal+v*vertical-from));
+		return Ray(from, unit(up_left_corner+u*horizontal-v*vertical-from));
 	}
 };
 

@@ -27,7 +27,7 @@ public:
 	Vec2f *_txts;
 	Material material;
 	Texture *texture;
-	TransformHierarchy *_trans_hierarchy;
+	//TransformHierarchy *_trans_hierarchy;
 	Matrix4x4 _trans_local_to_world;
 	Matrix4x4 _trans_local_to_world_inv;
 	
@@ -58,15 +58,20 @@ public:
 		assert(verts != NULL && nverts >= 3);
 		for (int i = 0; i < nverts; i++) {
 			vec3f v(verts[i]);
+			//std::cout << "local coord: " << v << std::endl;
 			v = _trans_local_to_world * v;
 			_verts_world[i] = v;
+			//std::cout << "world coord: " << v << std::endl;
+			//std::cout << "=================" << std::endl;
 		}
 	}
 
 	void addTriangle(Triangle* tri) { triangles.push_back(tri); }
 
-	void setTransformHierarchy(TransformHierarchy* trans) {
-		_trans_hierarchy = trans;
+	void setMeshTransform(TransformHierarchy* trans) {
+		//_trans_hierarchy = trans;
+		if (trans == NULL) return;
+
 		for (TransformHierarchy *t_tmp = trans; t_tmp != NULL; t_tmp = t_tmp->_parent) {
 			if (!t_tmp->_is_static) {
 				// mesh is not static

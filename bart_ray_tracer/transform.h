@@ -17,7 +17,8 @@ public:
     Matrix4x4 _transformMatrix;
     TransformHierarchy *_parent;
     Mesh *_mesh;
-    std::vector<TransformHierarchy*> _children;
+    //std::vector<TransformHierarchy*> _children;
+	TransformHierarchy *_child;
 
     TransformHierarchy(bool is_s) : _is_static(is_s) {
         _transformMatrix = Matrix4x4();
@@ -25,7 +26,8 @@ public:
     }
 
     void addChild(TransformHierarchy* t) {
-        _children.push_back(t);
+        //_children.push_back(t);
+		_child = t;
         t->_parent = this;
     }
 };

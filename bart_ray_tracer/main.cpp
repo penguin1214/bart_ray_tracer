@@ -8,6 +8,7 @@ RayTracer* rayTracer;
 std::stack<TransformHierarchy* >transformHierarchy;
 
 int main(int argc, char** argv) {
+	_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
 	/*if (argc!=2) {
 		std::cerr << argv[0] << " <file_name>." << std::endl;
 		return -1;
@@ -39,15 +40,12 @@ int main(int argc, char** argv) {
 		std::cout << "Parse file failed." << std::endl;
 	}
 
-	rayTracer->render();
-
-	//char *fname = "texture.ppm";
-	//float *t = new float[4*3];
-	//t[0] = 1.0f; t[1] = 1.0f; t[2] = 1.0f;
-	//t[3] = 0.1f; t[4] = 0.1f; t[5] = 0.5f;
-	//t[6] = 1.0f; t[7] = 1.0f; t[8] = 1.0f;
-	//t[9] = 0.1f; t[10] = 0.1f; t[11] = 0.5f;
-	//writePPMBin(t, 2, 2, fname);
+	float *image = new float[3 * rayTracer->scene->camera->film->height*rayTracer->scene->camera->film->width];
+	char *ofname = "image.ppm";
+	rayTracer->render(image);
+	// do scale
+	colorScale(image, rayTracer->scene->camera->film->height*rayTracer->scene->camera->film->width);
+	writePPMBin(image, rayTracer->scene->camera->film->width, rayTracer->scene->camera->film->height, ofname);
 
 	int tm;
 	std::cin >> tm;

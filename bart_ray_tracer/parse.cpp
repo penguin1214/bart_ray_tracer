@@ -494,12 +494,12 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, int nnorms, Vec2f 
 	size = step * 3;	// num of elements for a single triangle
 
 	Mesh* mesh = new Mesh(nverts, verts, nnorms, norms, ntxts, txts);
-	TransformHierarchy *t_top = transformHierarchy.top();
+	TransformHierarchy *t_top = transformHierarchy.top();	// current stack top
 	if (t_top != NULL) {
 		t_top->_mesh = mesh;
 	}
 	mesh->material = rawMaterial;
-	mesh->setTransformHierarchy(t_top);
+	mesh->setMeshTransform(t_top);
 
 	for (int i = 0; i < ntris; ++i) {
 		Triangle* tri = new Triangle(mesh);	// create triangle and bind mesh pointer
@@ -1191,6 +1191,10 @@ static void viAddStaticTransform(vec3f s,vec3f rot,float deg,vec3f trans) {
 	m *= rotate(rot.e[0], rot.e[1], rot.e[2], deg);
 	m *= scale(s.e[0], s.e[1], s.e[2]);
 	new_child->_transformMatrix = m;
+	TransformHierarchy *tp = transformHierarchy.top();
+	if (tp != NULL) {
+		tp->addChild(new_child);	// if this transform is the top transform, it only has child.
+	}
 	transformHierarchy.push(new_child);
 }
 
@@ -1198,6 +1202,10 @@ static void viAddTransform(char* name) {
 	/* TODO: transform */
 	TransformHierarchy* new_child = new TransformHierarchy(false);
 	transformHierarchy.push(new_child);
+}
+
+static void viEndTransform() {
+	transformHierarchy.pop();
 }
 
 /*----------------------------------------------------------------------
@@ -1358,6 +1366,7 @@ static void parseA(FILE *f)
 		}
 
 		/* TODO: set up your globabl ambient light here using amb */
+		colorNormalizeMetric(amb);
 		rayTracer->scene->addLight(new AmbientLight(amb));
 	}
 	else
@@ -1533,41 +1542,12 @@ static void parseMesh(FILE *fp)
 		exit(1);
 	}
 
-	for (int i = 0; i < num_txts; i++) {
-		txts[i][0] = Texture::scale(txts[i][0]);
-		txts[i][1] = Texture::scale(txts[i][1]);
-	}
-
-	// scale
-	//if (txts) {
-	//	float umin = 0; float umax = 0;
-	//	float vmin = 0; float vmax = 0;
-	//	for (int i = 0; i < num_txts; i++) {
-	//		// u
-	//		if (txts[i][0] < umin) umin = txts[i][0];
-	//		if (txts[i][0] > umax) umax = txts[i][0];
-	//		//v
-	//		if (txts[i][1] < vmin) vmin = txts[i][1];
-	//		if (txts[i][1] > vmax) vmax = txts[i][1];
-	//	}
-
-	//	// scaling
-	//	for (int i = 0; i < num_txts; i++) {
-	//		txts[i][0] = (txts[i][0] - umin) / (umax - umin);
-	//		txts[i][1] = (txts[i][1] - vmin) / (vmax - vmin);
-	//	}
-
-	//	if (umin < 0) {
-	//		for (int i = 0; i < num_txts; i++) {
-	//			txts[i][0] -= umin;
-	//		}
-	//	}
-	//	if (vmin < 0) {
-	//		for (int i = 0; i < num_txts; i++) {
-	//			txts[i][0] -= umin;
-	//		}
-	//	}
+	// Texture scaling CANNOT be applied here because of wrapping!
+	//for (int i = 0; i < num_txts; i++) {
+	//	txts[i][0] = Texture::scale(txts[i][0]);
+	//	txts[i][1] = Texture::scale(txts[i][1]);
 	//}
+
 	/* TODO: add a mesh here
 	 * e.g.,viAddMesh(verts,num_verts,norms,num_norms,txts,num_txts,texturename,indices,num_tris);
 	 */
@@ -1632,7 +1612,7 @@ bool viParseFile(FILE *f)
 				parseTransform(f);
 				break;
 			case '}':
-				// viEndXform();
+				viEndTransform();	// pop up transfom
 				break;
 			case 'a':  /* animation parameters or ambient light */
 				parseA(f);

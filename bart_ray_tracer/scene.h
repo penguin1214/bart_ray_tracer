@@ -85,21 +85,26 @@ public:
 			float *tC = tri->mesh_ptr->_txts[tri->txtIndex[2]];
 
 			float baryA, baryB, baryC;
-			/* TODO */
+			/* TODO barycentric coordinates are not corresponding to original ones?? */
 			Triangle::barycentric(P, A, B, C, baryB, baryC, baryA);
 
 			float tP[2];
 			tP[0] = baryA*tA[0] + baryB*tB[0] + baryC*tC[0];
 			tP[1] = baryA*tA[1] + baryB*tB[1] + baryC*tC[1];
 
+			// scale
+			tP[0] = Texture::scale(tP[0]);
+			tP[1] = Texture::scale(tP[1]);
+
 			int tmp_u = tP[0] * tri->mesh_ptr->texture->mWidth;
 			int tmp_v = tP[1] * tri->mesh_ptr->texture->mHeight;
+
 			int tmp_idx = tmp_v * tri->mesh_ptr->texture->mWidth + tmp_u;
 			tmp_idx *= 3;
 
-			col.e[0] = (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 0] / 255.0f;
-			col.e[1] = (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
-			col.e[2] = (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
+			col.e[0] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 0] / 255.0f;
+			col.e[1] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
+			col.e[2] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
 		}
 
 		return col;
@@ -109,13 +114,8 @@ public:
 		rec.t = 100;
 		for (std::vector<Shape* >::iterator it = shapes.begin(); it != shapes.end(); ++it) {
 			HitRecord tmpRec;
-			/*if ((*it)->intersect(r, tmpRec) && tmpRec.t < rec.t) {
+			if ((*it)->intersect(r, tmpRec) && tmpRec.t < rec.t) {
 				rec = tmpRec;
-			}*/
-			if ((*it)->intersect(r, tmpRec)) {
-				if (tmpRec.t < rec.t) {
-					rec = tmpRec;
-				}
 			}
 		}
 
