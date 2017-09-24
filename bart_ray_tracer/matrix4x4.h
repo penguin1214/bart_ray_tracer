@@ -49,11 +49,13 @@ class Matrix4x4
 	float *operator[](unsigned int i) { return m[i]; }
 	Matrix4x4 &operator*=(const Matrix4x4 mat)
 	{
-		for (int i = 0; i < 4; ++i)
-		{
-			for (int j = 0; j < 4; ++j)
-			{
-				m[i][j] = this->m[i][0] * mat.m[0][j] + this->m[i][1] * mat.m[1][j] + this->m[i][2] * mat.m[2][j] + this->m[i][3] * mat.m[3][j];
+		Matrix4x4 tmp = *this;
+		for (int i = 0; i < 4; ++i) {
+			for (int j = 0; j < 4; ++j) {
+				m[i][j] = tmp[i][0] * mat.m[0][j]
+					+ tmp[i][1] * mat.m[1][j]
+					+ tmp[i][2] * mat.m[2][j]
+					+ tmp[i][3] * mat.m[3][j];
 			}
 		}
 		return *this;
@@ -68,17 +70,15 @@ class Matrix4x4
 		return ret;
 	}
 
-	Matrix4x4 operator* (Matrix4x4 &m) {
-		Matrix4x4 tmp = *this;
+	Matrix4x4 operator* (Matrix4x4 &mat) {
+		Matrix4x4 ret;
 		for (int i = 0; i < 4; ++i) {
 			for (int j = 0; j < 4; ++j) {
-				m[i][j] = tmp.m[i][0] * m.m[0][j]
-					+ tmp.m[i][1] * m.m[1][j]
-					+ tmp.m[i][2] * m.m[2][j]
-					+ tmp.m[i][3] * m.m[3][j];
+				ret[i][j] = m[i][0] * mat[0][j] + m[i][1] * mat[1][j]
+					+ m[i][2] * mat[2][j] + m[i][3] * mat[3][j];
 			}
 		}
-		return *this;
+		return ret;
 	}
 
 	Matrix4x4 identity();
@@ -220,9 +220,50 @@ inline Matrix4x4 translate(float x, float y, float z)
 	return m;
 }
 
+/* TODO: rotate */
 inline Matrix4x4 rotate(float x, float y, float z, float degree)
 {
 	Matrix4x4 m;
+	float cos_alpha = cos(degree);
+	float sin_alpha = sin(degree);
+
+	if (x != 0.0 && y == 0.0 && z == 0.0) {  // rotate according to x axis
+		m[1][1] = cos_alpha;
+		m[1][2] = -sin_alpha;
+		m[2][1] = sin_alpha;
+		m[2][2] = cos_alpha;
+	}
+	else if (x == 0.0 && y != 0.0 && z == 0.0) { // rotate according to y axis
+		m[0][0] = cos_alpha;
+		m[0][2] = sin_alpha;
+		m[2][0] = -sin_alpha;
+		m[2][2] = cos_alpha;
+	}
+	else if (x == 0.0 && y == 0.0 && z != 0.0) {
+		m[0][0] = cos_alpha;
+		m[0][1] = -sin_alpha;
+		m[1][0] = sin_alpha;
+		m[1][1] = cos_alpha;
+	}
+	else {
+		vec3f axis = vec3f(x, y, z);
+		axis = unit(axis);
+		x = axis.x();
+		y = axis.y();
+		z = axis.z();
+
+		m[0][0] = (1 - cos_alpha) * x * x + cos_alpha;
+		m[0][1] = (1 - cos_alpha) * x * y - sin_alpha * y;
+		m[0][2] = (1 - cos_alpha) * x * z + sin_alpha * y;
+
+		m[1][0] = (1 - cos_alpha) * x * y + sin_alpha * z;
+		m[1][1] = (1 - cos_alpha) * y * y + cos_alpha;
+		m[1][2] = (1 - cos_alpha) * y * z - sin_alpha * x;
+
+		m[2][0] = (1 - cos_alpha) * x * z - sin_alpha * y;
+		m[2][1] = (1 - cos_alpha) * y * z + sin_alpha * x;
+		m[2][2] = (1 - cos_alpha) * z * z + cos_alpha;
+	}
 	return m;
 }
 

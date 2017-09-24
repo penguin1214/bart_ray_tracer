@@ -494,12 +494,12 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, int nnorms, Vec2f 
 	size = step * 3;	// num of elements for a single triangle
 
 	Mesh* mesh = new Mesh(nverts, verts, nnorms, norms, ntxts, txts);
-	TransformHierarchy *t_top = transformHierarchy.top();
+	TransformHierarchy *t_top = transformHierarchy.top();	// current stack top
 	if (t_top != NULL) {
 		t_top->_mesh = mesh;
 	}
 	mesh->material = rawMaterial;
-	mesh->setTransformHierarchy(t_top);
+	mesh->setMeshTransform(t_top);
 
 	for (int i = 0; i < ntris; ++i) {
 		Triangle* tri = new Triangle(mesh);	// create triangle and bind mesh pointer
@@ -1191,6 +1191,10 @@ static void viAddStaticTransform(vec3f s,vec3f rot,float deg,vec3f trans) {
 	m *= rotate(rot.e[0], rot.e[1], rot.e[2], deg);
 	m *= scale(s.e[0], s.e[1], s.e[2]);
 	new_child->_transformMatrix = m;
+	TransformHierarchy *tp = transformHierarchy.top();
+	if (tp != NULL) {
+		tp->addChild(new_child);	// if this transform is the top transform, it only has child.
+	}
 	transformHierarchy.push(new_child);
 }
 
@@ -1198,6 +1202,10 @@ static void viAddTransform(char* name) {
 	/* TODO: transform */
 	TransformHierarchy* new_child = new TransformHierarchy(false);
 	transformHierarchy.push(new_child);
+}
+
+static void viEndTransform() {
+	transformHierarchy.pop();
 }
 
 /*----------------------------------------------------------------------
@@ -1604,7 +1612,7 @@ bool viParseFile(FILE *f)
 				parseTransform(f);
 				break;
 			case '}':
-				// viEndXform();
+				viEndTransform();	// pop up transfom
 				break;
 			case 'a':  /* animation parameters or ambient light */
 				parseA(f);

@@ -121,13 +121,16 @@ public:
 
 inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 	/* TODO: Moller-Trumbore */
-	vec3f* verts = mesh_ptr->_verts_world;
+	vec3f* verts = mesh_ptr->_verts_world;	// use world(transformed) coordinates!
 	float eps = 1e-4;   // less than 1e-4, then
 
-	// clockwise
+	// counter-clockwise
 	vec3f v0 = verts[vertexIndex[0]];
 	vec3f v1 = verts[vertexIndex[1]];
 	vec3f v2 = verts[vertexIndex[2]];
+
+	//std::cout << v0 << std::endl << v1 << std::endl << v2 << std::endl;
+	//std::cout << "============================" << std::endl;
 
 	// compute plane normal
 	vec3f n = cross(v1-v0, v2-v0);

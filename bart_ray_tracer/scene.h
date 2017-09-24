@@ -114,13 +114,8 @@ public:
 		rec.t = 100;
 		for (std::vector<Shape* >::iterator it = shapes.begin(); it != shapes.end(); ++it) {
 			HitRecord tmpRec;
-			/*if ((*it)->intersect(r, tmpRec) && tmpRec.t < rec.t) {
+			if ((*it)->intersect(r, tmpRec) && tmpRec.t < rec.t) {
 				rec = tmpRec;
-			}*/
-			if ((*it)->intersect(r, tmpRec)) {
-				if (tmpRec.t < rec.t) {
-					rec = tmpRec;
-				}
 			}
 		}
 
