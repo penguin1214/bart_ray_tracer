@@ -37,8 +37,9 @@ public:
 	void setFrame(int n) { nframes = n; }
 
 	void render(float* image) {
-		for (int j = scene->camera->film->height-1; j >= 0; --j) {
-			double count = (1.0 - double(j) / double(scene->camera->film->height)) * 100.0;
+		std::cout << "rendering..." << std::endl;
+		for (int j = 0; j < scene->camera->film->height; ++j) {
+			double count = double(j) / double(scene->camera->film->height) * 100.0;
 			std::cout << count << "% done" << std::endl;
 			for (int i = 0; i < scene->camera->film->width; ++i) {
 				int index = j*scene->camera->film->width + i;
@@ -46,7 +47,7 @@ public:
 				vec3f col(0, 0, 0);
 				for (int s = 0; s < nsample; ++s) {
 					float random = ((double) rand() / (RAND_MAX)) + 1;
-					float u = 1.0 - float(i + random) / float(scene->camera->film->width);  // u, v cord??
+					float u = float(i + random) / float(scene->camera->film->width);  // u, v cord??
 					float v = float(j + random) / float(scene->camera->film->height);
 					Ray r = scene->camera->get_ray(u, v);
 					// trace
