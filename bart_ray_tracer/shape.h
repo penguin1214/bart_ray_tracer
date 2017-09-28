@@ -129,8 +129,6 @@ inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 	vec3f v1 = verts[vertexIndex[1]];
 	vec3f v2 = verts[vertexIndex[2]];
 
-	//std::cout << v0 << std::endl << v1 << std::endl << v2 << std::endl;
-	//std::cout << "============================" << std::endl;
 
 	// compute plane normal
 	vec3f n = cross(v1-v0, v2-v0);
@@ -167,6 +165,10 @@ inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 			+ mesh_ptr->_normals_world[normalIndex[1]]
 			+ mesh_ptr->_normals_world[normalIndex[2]]) / 3;
 	}
+
+	std::cout << v0 << std::endl << v1 << std::endl << v2 << std::endl;
+	std::cout << "intersect!" << std::endl;
+	std::cout << "============================" << std::endl;
 	return true;
 }
 

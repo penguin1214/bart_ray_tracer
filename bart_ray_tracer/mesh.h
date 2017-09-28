@@ -48,8 +48,10 @@ public:
 		verts = (vec3f*)malloc(nverts * sizeof(vec3f));
 		memcpy(verts, _verts_world, nverts * sizeof(vec3f));
 
-		_normals = (vec3f*)malloc(nnorms * sizeof(vec3f));
-		memcpy(_normals, _normals_world, nn * sizeof(vec3f));
+		if (_normals) {
+			_normals = (vec3f*)malloc(nnorms * sizeof(vec3f));
+			memcpy(_normals, _normals_world, nn * sizeof(vec3f));
+		}
 
 		/* TODO: deep copy */
 		/*_txts = (Vec2f*)malloc(ntxts * sizeof(Vec2f));
