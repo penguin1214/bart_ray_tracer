@@ -129,25 +129,29 @@ inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 	vec3f v1 = verts[vertexIndex[1]];
 	vec3f v2 = verts[vertexIndex[2]];
 
-
 	// compute plane normal
 	vec3f n = cross(v1-v0, v2-v0);
-	float d = dot(v0, n);
 
-	// parallel
-	if (std::abs(dot(n, r.direction())) < eps) return false;
+	float a,f,u,v;
+	vec3f edge1, edge2, h, s, q;
 
-	float t = - (dot(n, r.origin())+d) / dot(n, r.direction());
-	if (t<0) return false;  // behind
+	edge1 = v1 - v0; edge2 = v2 - v0;
+	cross(r.direction(), edge2);
+	a = dot(edge1, h);
+	if (a > -eps && a < eps) return false;
+	f = 1 / a;
+	s = r.origin() - v0;
+	u = f * (dot(s, h));
+	if ( u < 0.0 || u > 1.0) return false;
+	q = cross(s, edge1);
+	v = f * dot(r.direction(), q);
+	if ( v < 0.0 || u+v > 1.0) return false;
 
-	// check if in triangle
-	vec3f p = r.origin() + t*r.direction();
-	if (dot(n, cross((v1-v0),(p-v0))) < 0)
-		return false;
-	if (dot(n, cross((v2-v1),(p-v1))) < 0)
-		return false;
-	if (dot(n, cross((v0-v2),(p-v2))) < 0)
-		return false;
+	float t = f * dot(edge2, q);
+	if (t > eps) {
+		rec.p = r.origin() + t*r.direction();
+	}
+	else return;
 
 	rec.t = t;
 	rec.p = p;
@@ -165,11 +169,6 @@ inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 			+ mesh_ptr->_normals_world[normalIndex[1]]
 			+ mesh_ptr->_normals_world[normalIndex[2]]) / 3;
 	}
-
-	std::cout << v0 << std::endl << v1 << std::endl << v2 << std::endl;
-	std::cout << "intersect!" << std::endl;
-	std::cout << "============================" << std::endl;
-	return true;
 }
 
 inline bool Sphere::intersect(const Ray& r, HitRecord& rec) {
