@@ -7,6 +7,7 @@
 
 #include <cstring>
 #include "vec3f.h"
+#include "utility.h"
 
 class Matrix4x4
 {
@@ -74,8 +75,10 @@ class Matrix4x4
 		Matrix4x4 ret;
 		for (int i = 0; i < 4; ++i) {
 			for (int j = 0; j < 4; ++j) {
-				ret[i][j] = m[i][0] * mat[0][j] + m[i][1] * mat[1][j]
-					+ m[i][2] * mat[2][j] + m[i][3] * mat[3][j];
+				ret[i][j] = m[i][0] * mat[0][j]
+					+ m[i][1] * mat[1][j]
+					+ m[i][2] * mat[2][j]
+					+ m[i][3] * mat[3][j];
 			}
 		}
 		return ret;
@@ -84,6 +87,7 @@ class Matrix4x4
 	Matrix4x4 identity();
 	float determinate();
 	Matrix4x4 inverse();
+	Matrix4x4 transpose();
 };
 
 inline Matrix4x4 Matrix4x4::identity()
@@ -211,6 +215,16 @@ inline Matrix4x4 Matrix4x4::inverse()
 	return inv;
 }
 
+inline Matrix4x4 Matrix4x4::transpose() {
+	Matrix4x4 ret;
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+			ret[i][j] = m[j][i];
+		}
+	}
+	return ret;
+}
+
 inline Matrix4x4 translate(float x, float y, float z)
 {
 	Matrix4x4 m;
@@ -220,12 +234,11 @@ inline Matrix4x4 translate(float x, float y, float z)
 	return m;
 }
 
-/* TODO: rotate */
 inline Matrix4x4 rotate(float x, float y, float z, float degree)
 {
 	Matrix4x4 m;
-	float cos_alpha = cos(degree);
-	float sin_alpha = sin(degree);
+	float cos_alpha = cos(deg2rad(degree));
+	float sin_alpha = sin(deg2rad(degree));
 
 	if (x != 0.0 && y == 0.0 && z == 0.0) {  // rotate according to x axis
 		m[1][1] = cos_alpha;

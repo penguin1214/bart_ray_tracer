@@ -2,7 +2,7 @@
 #include "raytracer.h"
 #include "parse.h"
 
-#define MAX_DEPTH 10
+#define MAX_DEPTH 3
 
 RayTracer* rayTracer;
 std::stack<TransformHierarchy* >transformHierarchy;

@@ -22,8 +22,8 @@ public:
 	bool _is_static;
 	vec3f *verts;
 	vec3f *_verts_world;
-	vec3f *_norms;
-	vec3f *_norms_world;
+	vec3f *_normals;
+	vec3f *_normals_world;
 	Vec2f *_txts;
 	Material material;
 	Texture *texture;
@@ -44,14 +44,16 @@ public:
 	Mesh(uint32_t nv, vec3f *v, uint32_t nn, vec3f *n, uint32_t nt, Vec2f *t) {
 		_is_static = true;
 		nverts = nv; nnorms = nn; ntxts = nt;
-		_verts_world = v; _norms = n; _txts = t;
+		_verts_world = v; _normals_world = n; _txts = t;
 		verts = (vec3f*)malloc(nverts * sizeof(vec3f));
 		memcpy(verts, _verts_world, nverts * sizeof(vec3f));
-		/*_norms = (vec3f*)malloc(nnorms * sizeof(vec3f));
-		memcpy(_norms, n, nn * sizeof(vec3f));
-		_txts = (Vec2f*)malloc(ntxts * sizeof(Vec2f));
-		memcpy(_txts, t, nt * sizeof(Vec2f));*/
+
+		_normals = (vec3f*)malloc(nnorms * sizeof(vec3f));
+		memcpy(_normals, _normals_world, nn * sizeof(vec3f));
+
 		/* TODO: deep copy */
+		/*_txts = (Vec2f*)malloc(ntxts * sizeof(Vec2f));
+		memcpy(_txts, t, nt * sizeof(Vec2f));*/
 	}
 
 	void updateVertex() {
@@ -63,6 +65,17 @@ public:
 			_verts_world[i] = v;
 			//std::cout << "world coord: " << v << std::endl;
 			//std::cout << "=================" << std::endl;
+		}
+
+		if (_normals) {
+			assert(nnorms > 0);
+			for (int i = 0; i < nnorms; i++) {
+				vec3f n(_normals[i]);
+				// NOTE NORMAL TRANSFORMATION!!!
+				n = _trans_local_to_world_inv.transpose() * n;
+				n = unit(n);
+				_normals_world[i].e[0] = n.x(); _normals_world[i].e[1] = n.y(); _normals_world[i].e[2] = n.z();
+			}
 		}
 	}
 
