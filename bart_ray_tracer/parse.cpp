@@ -479,7 +479,7 @@ Format:
 	[ %g %g %g %g %g %g ] <-- for total_vertices vertices
 ----------------------------------------------------------------------*/
 
-static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, int nnorms, Vec2f *txts, int ntxts, unsigned int *indices, int ntris, char *textureName) {
+static void viAddMesh(vec3f* verts, int nverts, vec3f *normals, int nnormals, Vec2f *txts, int ntxts, unsigned int *indices, int ntris, char *textureName) {
 	/* coordinates passed to this function are all local coordinates,
 	 * transform is applied in this function.
 	 */
@@ -489,11 +489,11 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, int nnorms, Vec2f 
 	 * Generate triangles and add to scene.
 	 */
 	int size = 0; int step = 1;
-	if (norms) { step++; }
+	if (normals) { step++; }
 	if (txts) { step++; }
 	size = step * 3;	// num of elements for a single triangle
 
-	Mesh* mesh = new Mesh(nverts, verts, nnorms, norms, ntxts, txts);
+	Mesh* mesh = new Mesh(nverts, verts, nnormals, normals, ntxts, txts);
 	TransformHierarchy *t_top = transformHierarchy.top();	// current stack top
 	if (t_top != NULL) {
 		t_top->_mesh = mesh;
@@ -512,7 +512,7 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *norms, int nnorms, Vec2f 
 			tri->setTxtIndex(indices[i*size + step * 0 + j], indices[i*size + step * 1 + j], indices[i*size + step * 2 + j]);
 		j++;
 		}
-		if (norms) {
+		if (normals) {
 			tri->setNormalIndex(indices[i*size + step * 0 + j], indices[i*size + step * 1 + j], indices[i*size + step * 2 + j]);
 		j++;
 		}
@@ -1503,8 +1503,8 @@ static void getTriangles(FILE *fp,int *num_tris,unsigned int **indices,
 static void parseMesh(FILE *fp)
 {
 	char str[200];
-	int num_verts,num_norms,num_txts,num_tris;
-	vec3f *verts=NULL,*norms=NULL;
+	int num_verts,num_normals,num_txts,num_tris;
+	vec3f *verts=NULL,*normals=NULL;
 	Vec2f *txts=NULL;
 	unsigned int *indices;
 	char texturename[200];
@@ -1524,7 +1524,7 @@ static void parseMesh(FILE *fp)
 	fscanf(fp,"%s",str);
 	if(!strcmp(str, "normals"))
 	{
-		getVectors(fp,"normals",&num_norms,&norms);
+		getVectors(fp,"normals",&num_normals,&normals);
 		fscanf(fp,"%s",str);
 	}
 	if(!strcmp(str, "texturecoords"))
@@ -1534,7 +1534,7 @@ static void parseMesh(FILE *fp)
 	}
 	if(!strcmp(str,"triangles"))
 	{
-		getTriangles(fp,&num_tris,&indices,verts,norms,txts);
+		getTriangles(fp,&num_tris,&indices,verts,normals,txts);
 	}
 	else
 	{
@@ -1551,7 +1551,7 @@ static void parseMesh(FILE *fp)
 	/* TODO: add a mesh here
 	 * e.g.,viAddMesh(verts,num_verts,norms,num_norms,txts,num_txts,texturename,indices,num_tris);
 	 */
-	viAddMesh(verts, num_verts, norms, num_norms, txts, num_txts, indices, num_tris, texturename);
+	viAddMesh(verts, num_verts, normals, num_normals, txts, num_txts, indices, num_tris, texturename);
 }
 
 

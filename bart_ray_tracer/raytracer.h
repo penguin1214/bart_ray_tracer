@@ -24,7 +24,7 @@ public:
 	float nframes;
 
 	RayTracer(char* f, int d) : filename(f) {
-		nsample = 50;
+		nsample = 3;
 		scene = new Scene();
 		transformHierarchy.push(NULL);
 		scene->max_depth = d;
@@ -52,7 +52,7 @@ public:
 					Ray r = scene->camera->get_ray(u, v);
 					// trace
 					if (scene->max_depth == 0) { col += vec3f(0.0); }
-					col += scene->trace(r, 0);    // 110561 shapes
+					col += scene->trace(r, 0, 1.0);    // vacuum ior is 1.0
 				}
 				col /= float(nsample);
 				// gamma correct

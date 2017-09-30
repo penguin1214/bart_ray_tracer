@@ -17,6 +17,7 @@
 typedef float Vec2f[2];	// texture
 
 vec3f reflect(const vec3f &normal, const vec3f &incident);
+bool refract(const vec3f& v, const vec3f& norm, float ior, vec3f& refracted);
 
 class Scene {
 public:
@@ -34,7 +35,17 @@ public:
 		max_depth = 0;
 	}
 
-	vec3f trace(Ray& r, int depth) {
+	vec3f trace(Ray& r, int depth, float incident_ior) {
+		/*
+		 * When light intersect an object, we compute radiance at that point.
+		 * Objects are represented in geometry primitives like triangles, spheres, etc.
+		 * Use Phong reflection model to shade non-transmissive surfaces. (local illumination)
+		 * For translucent materials, transmission + reflection for dielectric materials, reflection for conductive materials.
+		 */
+
+		if (depth > max_depth) return vec3f(0.0);
+		depth++;
+
 		HitRecord record;
 		if (! intersect(r, record)) {
 			return vec3f(0.0);
@@ -50,6 +61,11 @@ public:
 		/*for (std::vector<Light* >::iterator it = lights.begin(); it != lights.end(); ++it) {
 
 		}*/
+
+		/*
+		//////////////////////////////////////////////////////////////////////////
+		/// FIRST COMPUTE LOCAL ILLUMINATION
+		//////////////////////////////////////////////////////////////////////////
 
 		// ambient
 		col += lights[0]->col * mat.ambient;
@@ -70,11 +86,33 @@ public:
 		tmp_cos = dot(v_reflect, v_view);
 		col += mat.specular * std::pow(std::max(float(0.0), dot(v_view, v_reflect)), 1000) * light->col;
 
+		//////////////////////////////////////////////////////////////////////////
+		/// THEN COMPUTE GLOBAL ILLUMINATION
+		/// RECURSIVELY CAST RAYS
+		//////////////////////////////////////////////////////////////////////////
+
+		// reflectance
+		vec3f reflect_dir = reflect(record.norm, r.d);
+		Ray r_reflect(record.p, reflect_dir);
+		vec3f col_r = trace(r_reflect, depth, incident_ior);
+		col += col_r * (1 - mat.T);
+
+		// refraction
+		if (mat.T) {	// do transmit
+			vec3f refract_dir;
+			if (refract(r.d, record.norm, incident_ior / mat.ior, refract_dir)) {
+				Ray r_refract(record.p, unit(refract_dir));
+				vec3f col_t = trace(r_refract, depth, mat.ior);
+				col += col_t * mat.T;
+			}
+			else {	// full reflect
+				col += col_r * mat.T;
+			}
+		}
 		// texture
 		if (record.obj->mesh_ptr && record.obj->mesh_ptr->_txts) {
 			// has texture
 			Triangle *tri = dynamic_cast<Triangle *>(record.obj);
-			/* TODO: use world coordinate or local? */
 			vec3f A = tri->mesh_ptr->verts[tri->vertexIndex[0]];
 			vec3f B = tri->mesh_ptr->verts[tri->vertexIndex[1]]; 
 			vec3f C = tri->mesh_ptr->verts[tri->vertexIndex[2]];
@@ -85,7 +123,7 @@ public:
 			float *tC = tri->mesh_ptr->_txts[tri->txtIndex[2]];
 
 			float baryA, baryB, baryC;
-			/* TODO barycentric coordinates are not corresponding to original ones?? */
+			// TODO barycentric coordinates are not corresponding to original ones??
 			Triangle::barycentric(P, A, B, C, baryB, baryC, baryA);
 
 			float tP[2];
@@ -106,6 +144,8 @@ public:
 			col.e[1] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
 			col.e[2] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
 		}
+		*/
+		col = vec3f(0.5);
 
 		return col;
 	}
