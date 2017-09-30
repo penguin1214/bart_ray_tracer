@@ -145,7 +145,7 @@ public:
 			col.e[2] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
 		}
 		*/
-		col + vec3f(0.5);
+		col = vec3f(0.5);
 
 		return col;
 	}

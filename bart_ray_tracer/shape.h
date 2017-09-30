@@ -36,7 +36,7 @@ struct HitRecord {
 	Shape* obj;
 };
 
-class Triangle: public Shape {
+class Triangle : public Shape {
 public:
 	unsigned int vertexIndex[3];
 	unsigned int normalIndex[3];
@@ -92,7 +92,7 @@ public:
 	}
 };
 
-class Sphere: public Shape {
+class Sphere : public Shape {
 public:
 	vec3f center;
 	float radius;
@@ -103,12 +103,12 @@ public:
 	inline bool intersect(const Ray& r, HitRecord &rec);
 };
 
-class Cone: public Shape {
+class Cone : public Shape {
 public:
 
 };
 
-class Plane: public Shape {
+class Plane : public Shape {
 public:
 	vec3f norm;
 	float d;
@@ -116,11 +116,10 @@ public:
 	Plane() {}
 	Plane(vec3f n, float dis) : norm(n), d(dis) {}
 
-//    inline bool intersect(const Ray& r, HitRecord &rec);
+	//    inline bool intersect(const Ray& r, HitRecord &rec);
 };
 
 inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
-	/* TODO: Moller-Trumbore */
 	vec3f* verts = mesh_ptr->_verts_world;	// use world(transformed) coordinates!
 	float eps = 1e-4;   // less than 1e-4, then
 
@@ -130,31 +129,26 @@ inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 	vec3f v2 = verts[vertexIndex[2]];
 
 	// compute plane normal
-	vec3f n = cross(v1-v0, v2-v0);
+	vec3f n = cross(v1 - v0, v2 - v0);
 
-	float a,f,u,v;
-	vec3f edge1, edge2, h, s, q;
+	vec3f v0v1 = v1 - v0; vec3f v0v2 = v2 - v0;
+	vec3f pvec = cross(r.d, v0v2);
+	float det = dot(v0v1, pvec);
+	// do not culling
 
-	edge1 = v1 - v0; edge2 = v2 - v0;
-	cross(r.direction(), edge2);
-	a = dot(edge1, h);
-	if (a > -eps && a < eps) return false;
-	f = 1 / a;
-	s = r.origin() - v0;
-	u = f * (dot(s, h));
-	if ( u < 0.0 || u > 1.0) return false;
-	q = cross(s, edge1);
-	v = f * dot(r.direction(), q);
-	if ( v < 0.0 || u+v > 1.0) return false;
+	if (std::fabs(det < eps)) return false;
 
-	float t = f * dot(edge2, q);
-	if (t > eps) {
-		rec.p = r.origin() + t*r.direction();
-	}
-	else return;
+	float invDet = 1.0 / det;
+	vec3f tvec = r.o - v0;
+	float u = dot(tvec, pvec) * invDet;
+	if (u < 0 || u > 1) return false;
 
-	rec.t = t;
-	rec.p = p;
+	vec3f qvec = cross(tvec, v0v1);
+	float v = dot(r.d, qvec) * invDet;
+	if (v < 0 || u + v > 1) return false;
+
+	rec.t = dot(v0v2, qvec) * invDet;
+	rec.p = r.origin() + rec.t*r.direction();
 	rec.obj = this;
 
 	// special treatment for normals!
@@ -176,7 +170,7 @@ inline bool Sphere::intersect(const Ray& r, HitRecord& rec) {
 	float a = dot(r.direction(), r.direction());
 	float b = dot(oc, r.direction());
 	float c = dot(oc, oc) - radius*radius;
-	float disc = b*b-a*c;
+	float disc = b*b - a*c;
 	if ((sqrt(disc)) >= 0) {
 		// calculate hit point
 		float temp = (-b - sqrt(b * b - a * c)) / a;
