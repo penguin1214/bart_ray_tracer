@@ -55,24 +55,25 @@ public:
 
 		// handle intersect color
 		Material mat = record.obj->material();
-		col += record.obj->material().ambient;
 
 		// light
 		/*for (std::vector<Light* >::iterator it = lights.begin(); it != lights.end(); ++it) {
 
 		}*/
 
-		/*
 		//////////////////////////////////////////////////////////////////////////
 		/// FIRST COMPUTE LOCAL ILLUMINATION
 		//////////////////////////////////////////////////////////////////////////
 
 		// ambient
-		col += lights[0]->col * mat.ambient;
+		//col += lights[0]->col * mat.ambient;
 
 		// diffuse
 		Light *light = lights[1]; // diffuse
 		Ray r_scnd(record.p, unit(light->pos - record.p));
+		HitRecord shadow_rec;
+		if (!intersect(r_scnd, shadow_rec)) return lights[0]->col;	// if shadow, return ambient
+
 		float tmp_cos = dot(r_scnd.direction(), record.norm);
 		if (tmp_cos > 0) {
 			if (mat.diffuse.x() > 0 || mat.diffuse.y() > 0 || mat.diffuse.z() > 0) {
@@ -81,16 +82,19 @@ public:
 		}
 
 		// specular
-		vec3f v_view = unit(camera->at - record.p);
+		vec3f v_view = unit(camera->from - record.p);
 		vec3f v_reflect = unit(reflect(record.norm, r.direction()));
 		tmp_cos = dot(v_reflect, v_view);
-		col += mat.specular * std::pow(std::max(float(0.0), dot(v_view, v_reflect)), 1000) * light->col;
+		if (tmp_cos > 0.0) {
+			col += mat.specular * std::pow(std::max(float(0.0), tmp_cos), mat.shine) * light->col;
+		}
 
 		//////////////////////////////////////////////////////////////////////////
 		/// THEN COMPUTE GLOBAL ILLUMINATION
 		/// RECURSIVELY CAST RAYS
 		//////////////////////////////////////////////////////////////////////////
 
+		/*
 		// reflectance
 		vec3f reflect_dir = reflect(record.norm, r.d);
 		Ray r_reflect(record.p, reflect_dir);
@@ -98,7 +102,7 @@ public:
 		col += col_r * (1 - mat.T);
 
 		// refraction
-		if (mat.T) {	// do transmit
+		if (mat.T > 0.0) {	// do transmit
 			vec3f refract_dir;
 			if (refract(r.d, record.norm, incident_ior / mat.ior, refract_dir)) {
 				Ray r_refract(record.p, unit(refract_dir));
@@ -109,6 +113,9 @@ public:
 				col += col_r * mat.T;
 			}
 		}
+		*/
+
+		/*
 		// texture
 		if (record.obj->mesh_ptr && record.obj->mesh_ptr->_txts) {
 			// has texture
@@ -145,7 +152,6 @@ public:
 			col.e[2] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
 		}
 		*/
-		col = vec3f(0.5);
 
 		return col;
 	}

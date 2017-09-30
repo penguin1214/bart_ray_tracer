@@ -24,7 +24,7 @@ public:
 	float nframes;
 
 	RayTracer(char* f, int d) : filename(f) {
-		nsample = 3;
+		nsample = 10;
 		scene = new Scene();
 		transformHierarchy.push(NULL);
 		scene->max_depth = d;

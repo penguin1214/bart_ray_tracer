@@ -152,10 +152,7 @@ inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 	rec.obj = this;
 
 	// special treatment for normals!
-	if (mesh_ptr->_normals == NULL || mesh_ptr->nnorms == 0) { // no read-in normals
-		rec.norm = unit(n);
-	}
-	else {
+	if (!(mesh_ptr->_normals == NULL || mesh_ptr->nnorms == 0)) { // read-in normals
 		// normal intersection
 		// TODO
 		// use average instead now
@@ -163,6 +160,7 @@ inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 			+ mesh_ptr->_normals_world[normalIndex[1]]
 			+ mesh_ptr->_normals_world[normalIndex[2]]) / 3;
 	}
+	rec.norm = unit(n);
 }
 
 inline bool Sphere::intersect(const Ray& r, HitRecord& rec) {

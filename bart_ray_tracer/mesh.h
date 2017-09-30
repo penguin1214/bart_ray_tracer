@@ -48,7 +48,7 @@ public:
 		verts = (vec3f*)malloc(nverts * sizeof(vec3f));
 		memcpy(verts, _verts_world, nverts * sizeof(vec3f));
 
-		if (_normals) {
+		if (_normals_world) {
 			_normals = (vec3f*)malloc(nnorms * sizeof(vec3f));
 			memcpy(_normals, _normals_world, nn * sizeof(vec3f));
 		}
