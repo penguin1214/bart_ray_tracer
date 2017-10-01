@@ -9,6 +9,8 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <omp.h>
+
 #include "scene.h"
 #include "transform.h"
 #include "vec3f.h"
@@ -24,7 +26,7 @@ public:
 	float nframes;
 
 	RayTracer(char* f, int d) : filename(f) {
-		nsample = 10;
+		nsample = 1;
 		scene = new Scene();
 		transformHierarchy.push(NULL);
 		scene->max_depth = d;
@@ -37,21 +39,26 @@ public:
 	void setFrame(int n) { nframes = n; }
 
 	void render(float* image) {
+		// build BVH
+
 		std::cout << "rendering..." << std::endl;
 		for (int j = 0; j < scene->camera->film->height; ++j) {
 			double count = double(j) / double(scene->camera->film->height) * 100.0;
+
+#pragma omp parallel for
 			std::cout << count << "% done" << std::endl;
+
 			for (int i = 0; i < scene->camera->film->width; ++i) {
 				int index = j*scene->camera->film->width + i;
 
 				vec3f col(0, 0, 0);
 				for (int s = 0; s < nsample; ++s) {
-					float random = ((double) rand() / (RAND_MAX)) + 1;
+					float random = ((double)rand() / (RAND_MAX)) + 1;
 					float u = float(i + random) / float(scene->camera->film->width);  // u, v cord??
 					float v = float(j + random) / float(scene->camera->film->height);
 					Ray r = scene->camera->get_ray(u, v);
 					// trace
-					if (scene->max_depth == 0) { col += vec3f(0.0); }
+					//if (scene->max_depth == 0) { col += vec3f(0.0); }
 					col += scene->trace(r, 0, 1.0);    // vacuum ior is 1.0
 				}
 				col /= float(nsample);
@@ -65,15 +72,15 @@ public:
 		}
 	}
 
-//    vec3f trace(const Ray& r, std::vector<Shape* > shapes) {
-//        for (std::vector<Shape* >::iterator it = shapes.begin(); it != shapes.end(); ++it) {
-//            HitRecord record;
-//            if (depth == 0) {
-//                return vec3f(0.0);
-//            }
-//
-//        }
-//    }
+	//    vec3f trace(const Ray& r, std::vector<Shape* > shapes) {
+	//        for (std::vector<Shape* >::iterator it = shapes.begin(); it != shapes.end(); ++it) {
+	//            HitRecord record;
+	//            if (depth == 0) {
+	//                return vec3f(0.0);
+	//            }
+	//
+	//        }
+	//    }
 };
 
 // !!! ATTENTION

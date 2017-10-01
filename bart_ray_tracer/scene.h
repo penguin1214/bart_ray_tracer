@@ -8,6 +8,8 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
+
+#include "core.h"
 #include "shape.h"
 #include "light.h"
 #include "camera.h"
@@ -32,7 +34,6 @@ public:
 		gAnimations = NULL;
 		camera = new Camera();
 		background = vec3f(0.0);
-		max_depth = 0;
 	}
 
 	vec3f trace(Ray& r, int depth, float incident_ior) {
@@ -43,7 +44,7 @@ public:
 		 * For translucent materials, transmission + reflection for dielectric materials, reflection for conductive materials.
 		 */
 
-		if (depth > max_depth) return vec3f(0.0);
+		if (depth > G_MAX_DEPTH) return vec3f(0.0);
 		depth++;
 
 		HitRecord record;
@@ -66,15 +67,15 @@ public:
 		//////////////////////////////////////////////////////////////////////////
 
 		// ambient
-		//col += lights[0]->col * mat.ambient;
+		col += lights[0]->col * mat.ambient;
 
 		// diffuse
 		Light *light = lights[1]; // diffuse
 		Ray r_scnd(record.p, unit(light->pos - record.p));
 		HitRecord shadow_rec;
-		if (!intersect(r_scnd, shadow_rec)) return lights[0]->col;	// if shadow, return ambient
+		if (!intersect(r_scnd, shadow_rec)) return col;	// if shadow, return ambient
 
-		float tmp_cos = dot(r_scnd.direction(), record.norm);
+		float tmp_cos = dot(r_scnd.d, record.norm);
 		if (tmp_cos > 0) {
 			if (mat.diffuse.x() > 0 || mat.diffuse.y() > 0 || mat.diffuse.z() > 0) {
 				col += tmp_cos * mat.diffuse * light->col;
@@ -94,10 +95,9 @@ public:
 		/// RECURSIVELY CAST RAYS
 		//////////////////////////////////////////////////////////////////////////
 
-		/*
 		// reflectance
 		vec3f reflect_dir = reflect(record.norm, r.d);
-		Ray r_reflect(record.p, reflect_dir);
+		Ray r_reflect(record.p, unit(reflect_dir));
 		vec3f col_r = trace(r_reflect, depth, incident_ior);
 		col += col_r * (1 - mat.T);
 
@@ -113,9 +113,7 @@ public:
 				col += col_r * mat.T;
 			}
 		}
-		*/
 
-		/*
 		// texture
 		if (record.obj->mesh_ptr && record.obj->mesh_ptr->_txts) {
 			// has texture
@@ -147,11 +145,10 @@ public:
 			int tmp_idx = tmp_v * tri->mesh_ptr->texture->mWidth + tmp_u;
 			tmp_idx *= 3;
 
-			col.e[0] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 0] / 255.0f;
-			col.e[1] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
-			col.e[2] += (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
+			col.e[0] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 0] / 255.0f;
+			col.e[1] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
+			col.e[2] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
 		}
-		*/
 
 		return col;
 	}

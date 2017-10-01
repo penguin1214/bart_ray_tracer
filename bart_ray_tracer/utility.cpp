@@ -16,12 +16,12 @@ void writePPMBin(float *image, int size_x, int size_y, char *filename) {
 	for (int j = 0; j < size_y; j++)  // loop over pixels, write RGB values
 		for (int i = 0; i < size_x; i++) {
 			int index = j*size_x + i;
-			if (image[index * 3 + 0] || image[index * 3 + 1] || image[index * 3 + 2]) {
+			/*if (image[index * 3 + 0] || image[index * 3 + 1] || image[index * 3 + 2]) {
 				std::cout << image[index * 3 + 0] * 255 << std::endl;
 				std::cout << image[index * 3 + 1] * 255 << std::endl;
 				std::cout << image[index * 3 + 2] * 255 << std::endl;
 				std::cout << "===================" << std::endl;
-			}
+			}*/
 			ofs << (unsigned char)((std::min)(1.0f, image[index * 3 + 0]) * 255);
 			ofs << (unsigned char)((std::min)(1.0f, image[index * 3 + 1]) * 255);
 			ofs << (unsigned char)((std::min)(1.0f, image[index * 3 + 2]) * 255);

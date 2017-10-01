@@ -151,15 +151,15 @@ inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 	rec.p = r.origin() + rec.t*r.direction();
 	rec.obj = this;
 
-	// special treatment for normals!
-	if (!(mesh_ptr->_normals == NULL || mesh_ptr->nnorms == 0)) { // read-in normals
-		// normal intersection
-		// TODO
-		// use average instead now
-		n = (mesh_ptr->_normals_world[normalIndex[0]]
-			+ mesh_ptr->_normals_world[normalIndex[1]]
-			+ mesh_ptr->_normals_world[normalIndex[2]]) / 3;
-	}
+	// TODO: special treatment for normals!
+	//if (!(mesh_ptr->_normals == NULL || mesh_ptr->nnorms == 0)) { // read-in normals
+	//	// normal intersection
+	//	// TODO
+	//	// use average instead now
+	//	n = (mesh_ptr->_normals_world[normalIndex[0]]
+	//		+ mesh_ptr->_normals_world[normalIndex[1]]
+	//		+ mesh_ptr->_normals_world[normalIndex[2]]) / 3;
+	//}
 	rec.norm = unit(n);
 }
 
