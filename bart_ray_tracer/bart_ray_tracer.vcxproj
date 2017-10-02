@@ -82,7 +82,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ShowIncludes>true</ShowIncludes>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -117,13 +117,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="animation.c" />
+    <ClCompile Include="bvh.cpp" />
     <ClCompile Include="kbsplpos.c" />
     <ClCompile Include="kbsplrot.c" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="mesh.cpp" />
     <ClCompile Include="parse.cpp" />
     <ClCompile Include="quat.c" />
     <ClCompile Include="raytracer.cpp" />
     <ClCompile Include="scene.cpp" />
+    <ClCompile Include="shape.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="utility.cpp" />
