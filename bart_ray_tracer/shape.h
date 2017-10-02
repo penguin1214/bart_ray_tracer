@@ -5,7 +5,9 @@
 #ifndef BART_RAY_TRACER_SHAPE_H
 #define BART_RAY_TRACER_SHAPE_H
 
-#include "vec3f.h"
+#include <math.h>
+
+#include "core.h"
 #include "ray.h"
 #include "material.h"
 #include "mesh.h"
@@ -29,12 +31,33 @@ public:
 	}
 };
 
+
 struct HitRecord {
 	float t;
-	vec3f p;    // point coord
+	vec3f p;
 	vec3f norm;
 	Shape* obj;
 };
+
+struct ExtentHitRecord {
+	float t_near = 0;
+	float t_far = INFINITY;
+	int plane_idx;
+};
+
+
+class BBox : public Shape {
+public:
+	BBox() {}
+	BBox(vec3f &min, vec3f &max) : p_min(min), p_max(max) {}
+	~BBox() {}
+
+	bool intersect();	// TODO
+
+	vec3f p_min;
+	vec3f p_max;
+};
+
 
 class Triangle : public Shape {
 public:

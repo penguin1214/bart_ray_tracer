@@ -11,9 +11,9 @@
 #include <iostream>
 #include <omp.h>
 
+#include "core.h"
 #include "scene.h"
 #include "transform.h"
-#include "vec3f.h"
 #include "ray.h"
 
 class RayTracer {
@@ -26,7 +26,7 @@ public:
 	float nframes;
 
 	RayTracer(char* f) : filename(f) {
-		nsample = 10;
+		nsample = 1;
 		scene = new Scene();
 		transformHierarchy.push(NULL);
 	}
@@ -69,16 +69,6 @@ public:
 			}
 		}
 	}
-
-	//    vec3f trace(const Ray& r, std::vector<Shape* > shapes) {
-	//        for (std::vector<Shape* >::iterator it = shapes.begin(); it != shapes.end(); ++it) {
-	//            HitRecord record;
-	//            if (depth == 0) {
-	//                return vec3f(0.0);
-	//            }
-	//
-	//        }
-	//    }
 };
 
 // !!! ATTENTION

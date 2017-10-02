@@ -13,7 +13,6 @@
 #include "shape.h"
 #include "light.h"
 #include "camera.h"
-#include "vec3f.h"
 #include "animation.h"
 
 typedef float Vec2f[2];	// texture

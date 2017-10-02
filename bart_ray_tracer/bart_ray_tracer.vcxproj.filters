@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Accelarator">
+      <UniqueIdentifier>{3fc0f47f-88fc-4d26-9ca5-75ad54330381}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="animation.c">
@@ -112,6 +115,9 @@
     </ClInclude>
     <ClInclude Include="core.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bvh.h">
+      <Filter>Header Files\Accelarator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
