@@ -1,4 +1,4 @@
-#include <iostream>TransformHierarchy *transform
+#include <iostream>
 #include "raytracer.h"
 #include "parse.h"
 
@@ -6,6 +6,7 @@
 
 RayTracer* rayTracer;
 std::stack<TransformHierarchy* >transformHierarchy;
+
 
 int main(int argc, char** argv) {
 	_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
@@ -27,7 +28,7 @@ int main(int argc, char** argv) {
 
 	// rayTracer declared in raytracer.h
 	//rayTracer = new RayTracer(argv[1], MAX_DEPTH);
-	rayTracer = new RayTracer(filename, MAX_DEPTH);
+	rayTracer = new RayTracer(filename);
 
 	/*
 	 * four keywords are related to shape:

@@ -19,6 +19,8 @@
 #include "matrix4x4.h"
 #include "mesh.h"
 #include "common.h"
+#include "material.h"
+#include "shape.h"
 
 #ifndef  M_PI
 #define  M_PI 3.1415926535897932384626433
@@ -498,7 +500,7 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *normals, int nnormals, Ve
 	if (t_top != NULL) {
 		t_top->_mesh = mesh;
 	}
-	mesh->material = rawMaterial;
+	mesh->material = &rawMaterial;
 	mesh->setMeshTransform(t_top);
 
 	for (int i = 0; i < ntris; ++i) {
