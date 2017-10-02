@@ -57,7 +57,6 @@ public:
 					float v = float(j + random) / float(scene->camera->film->height);
 					Ray r = scene->camera->get_ray(u, v);
 					// trace
-					//if (scene->max_depth == 0) { col += vec3f(0.0); }
 					col += scene->trace(r, 0, 1.0);    // vacuum ior is 1.0
 				}
 				col /= float(nsample);

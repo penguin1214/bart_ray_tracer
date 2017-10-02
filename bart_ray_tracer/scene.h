@@ -19,7 +19,7 @@
 typedef float Vec2f[2];	// texture
 
 vec3f reflect(const vec3f &normal, const vec3f &incident);
-bool refract(const vec3f& v, const vec3f& norm, float ior, vec3f& refracted);
+bool refract(const vec3f& v, vec3f& norm, float ior, vec3f& refracted);
 
 class Scene {
 public:
@@ -52,8 +52,7 @@ public:
 			return vec3f(0.0);
 		}
 
-		vec3f col(0.5);
-#if 0
+		vec3f col(0.0);
 		// handle intersect color
 		Material mat = record.obj->material();
 
@@ -106,7 +105,7 @@ public:
 			vec3f refract_dir;
 			if (refract(r.d, record.norm, incident_ior / mat.ior, refract_dir)) {
 				Ray r_refract(record.p - record.norm * eps, unit(refract_dir));
-				std::cout << "trace refraction" << std::endl;
+				//std::cout << "trace refraction" << std::endl;
 				vec3f col_t = trace(r_refract, depth, mat.ior);
 				col += col_t * mat.T;
 			}
@@ -150,7 +149,6 @@ public:
 			col.e[1] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
 			col.e[2] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
 		}
-#endif
 		return col;
 	}
 
