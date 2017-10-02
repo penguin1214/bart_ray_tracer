@@ -129,7 +129,7 @@ inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 	vec3f v2 = verts[vertexIndex[2]];
 
 	// compute plane normal
-	vec3f n = cross(v1 - v0, v2 - v0);
+	vec3f n = -cross(v1 - v0, v2 - v0);
 
 	vec3f v0v1 = v1 - v0; vec3f v0v2 = v2 - v0;
 	vec3f pvec = cross(r.d, v0v2);
@@ -152,14 +152,16 @@ inline bool Triangle::intersect(Ray& r, HitRecord& rec) {
 	rec.obj = this;
 
 	// TODO: special treatment for normals!
-	//if (!(mesh_ptr->_normals == NULL || mesh_ptr->nnorms == 0)) { // read-in normals
-	//	// normal intersection
-	//	// TODO
-	//	// use average instead now
-	//	n = (mesh_ptr->_normals_world[normalIndex[0]]
-	//		+ mesh_ptr->_normals_world[normalIndex[1]]
-	//		+ mesh_ptr->_normals_world[normalIndex[2]]) / 3;
-	//}
+	if (!(mesh_ptr->_normals == NULL || mesh_ptr->nnorms == 0)) { // read-in normals
+		// normal intersection
+		// TODO
+		// use average instead now
+		//std::cout << "before: " << unit(n) << std::endl;
+		n = (mesh_ptr->_normals_world[normalIndex[0]]
+			+ mesh_ptr->_normals_world[normalIndex[1]]
+			+ mesh_ptr->_normals_world[normalIndex[2]]) / 3.0;
+		//std::cout << "after: " << n << std::endl << "===" << std::endl;
+	}
 	rec.norm = unit(n);
 }
 

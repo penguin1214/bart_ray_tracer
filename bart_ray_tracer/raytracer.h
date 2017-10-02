@@ -25,11 +25,10 @@ public:
 	float end_time;
 	float nframes;
 
-	RayTracer(char* f, int d) : filename(f) {
-		nsample = 1;
+	RayTracer(char* f) : filename(f) {
+		nsample = 10;
 		scene = new Scene();
 		transformHierarchy.push(NULL);
-		scene->max_depth = d;
 	}
 
 	void setTime(float s, float e) {

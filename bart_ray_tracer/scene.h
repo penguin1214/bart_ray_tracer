@@ -28,7 +28,6 @@ public:
 	std::vector<Light*> lights;
 	vec3f background;
 	AnimationList* gAnimations;
-	int max_depth;
 
 	Scene() {
 		gAnimations = NULL;
@@ -44,6 +43,7 @@ public:
 		 * For translucent materials, transmission + reflection for dielectric materials, reflection for conductive materials.
 		 */
 
+		//std::cout << "depth: " << depth << std::endl;
 		if (depth > G_MAX_DEPTH) return vec3f(0.0);
 		depth++;
 
@@ -52,8 +52,8 @@ public:
 			return vec3f(0.0);
 		}
 
-		vec3f col(0.0);
-
+		vec3f col(0.5);
+#if 0
 		// handle intersect color
 		Material mat = record.obj->material();
 
@@ -65,15 +65,13 @@ public:
 		//////////////////////////////////////////////////////////////////////////
 		/// FIRST COMPUTE LOCAL ILLUMINATION
 		//////////////////////////////////////////////////////////////////////////
-
+		Light *light = lights[1];
 		// ambient
-		col += lights[0]->col * mat.ambient;
-
+		col += light->col * mat.ambient;
 		// diffuse
-		Light *light = lights[1]; // diffuse
 		Ray r_scnd(record.p, unit(light->pos - record.p));
 		HitRecord shadow_rec;
-		if (!intersect(r_scnd, shadow_rec)) return col;	// if shadow, return ambient
+		if (!intersect(r_scnd, shadow_rec)) return lights[0]->col;	// TODO if shadow, return ambient
 
 		float tmp_cos = dot(r_scnd.d, record.norm);
 		if (tmp_cos > 0) {
@@ -90,14 +88,16 @@ public:
 			col += mat.specular * std::pow(std::max(float(0.0), tmp_cos), mat.shine) * light->col;
 		}
 
+		//std::cout << "local illu: " << col << std::endl;
 		//////////////////////////////////////////////////////////////////////////
 		/// THEN COMPUTE GLOBAL ILLUMINATION
 		/// RECURSIVELY CAST RAYS
 		//////////////////////////////////////////////////////////////////////////
-
+		float eps = 1e-4;	// bias to avoid numerical error
 		// reflectance
 		vec3f reflect_dir = reflect(record.norm, r.d);
-		Ray r_reflect(record.p, unit(reflect_dir));
+		Ray r_reflect(record.p + record.norm * eps, unit(reflect_dir));
+		//std::cout << "trace reflection" << std::endl;
 		vec3f col_r = trace(r_reflect, depth, incident_ior);
 		col += col_r * (1 - mat.T);
 
@@ -105,7 +105,8 @@ public:
 		if (mat.T > 0.0) {	// do transmit
 			vec3f refract_dir;
 			if (refract(r.d, record.norm, incident_ior / mat.ior, refract_dir)) {
-				Ray r_refract(record.p, unit(refract_dir));
+				Ray r_refract(record.p - record.norm * eps, unit(refract_dir));
+				std::cout << "trace refraction" << std::endl;
 				vec3f col_t = trace(r_refract, depth, mat.ior);
 				col += col_t * mat.T;
 			}
@@ -149,7 +150,7 @@ public:
 			col.e[1] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
 			col.e[2] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
 		}
-
+#endif
 		return col;
 	}
 

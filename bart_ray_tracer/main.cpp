@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
 
 	// rayTracer declared in raytracer.h
 	//rayTracer = new RayTracer(argv[1], MAX_DEPTH);
-	rayTracer = new RayTracer(filename, MAX_DEPTH);
+	rayTracer = new RayTracer(filename);
 
 	/*
 	 * four keywords are related to shape:
