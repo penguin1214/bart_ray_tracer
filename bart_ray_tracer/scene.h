@@ -10,11 +10,13 @@
 #include <cmath>
 
 #include "core.h"
+#include "bvh.h"
 #include "light.h"
 #include "camera.h"
 #include "animation.h"
 
 class Material;
+class Mesh;
 class Shape;
 struct HitRecord;
 
@@ -26,16 +28,19 @@ bool refract(const vec3f& v, vec3f& norm, float ior, vec3f& refracted);
 class Scene {
 public:
 	Camera *camera;
+	std::vector<Mesh*> meshes;
 	std::vector<Shape*> shapes;
 	std::vector<Light*> lights;
 	vec3f background;
 	AnimationList* gAnimations;
+	BVH *bvh;
 
 	Scene();
 
 	vec3f trace(Ray& r, int depth, float incident_ior);
 	bool intersect(Ray& r, HitRecord& rec);
 	void setBackground(vec3f c);
+	void addMesh(Mesh* m);
 	void addShape(Shape* shape);
 	void addLight(Light* l);
 };

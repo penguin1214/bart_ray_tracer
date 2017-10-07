@@ -5,6 +5,7 @@
 #ifndef BART_RAY_TRACER_SHAPE_H
 #define BART_RAY_TRACER_SHAPE_H
 
+#include <memory>
 #include <math.h>
 
 #include "core.h"

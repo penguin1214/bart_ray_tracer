@@ -31,6 +31,10 @@ public:
 		transformHierarchy.push(NULL);
 	}
 
+	void init() {
+		// scene->bvh = new BVH(scene->meshes);
+	}
+
 	void setTime(float s, float e) {
 		start_time = s; end_time = e;
 	}
@@ -39,6 +43,7 @@ public:
 
 	void render(float* image) {
 		// build BVH
+		// scene->bvh->_octree->build();	// update tree
 
 		std::cout << "rendering..." << std::endl;
 		for (int j = 0; j < scene->camera->film->height; ++j) {

@@ -9,6 +9,7 @@
 //////////////////////////////////////////////////////////////////////////
 Scene::Scene() {
 	gAnimations = NULL;
+	bvh = nullptr;
 	camera = new Camera();
 	background = vec3f(0.0);
 }
@@ -30,7 +31,7 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 		return vec3f(0.0);
 	}
 
-	vec3f col(0.0);
+	vec3f col(0.1);
 	// handle intersect color
 	Material *mat = record.obj->material();
 
@@ -103,6 +104,7 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 		}
 	}
 
+#if 0
 	// texture
 	if (record.obj->mesh_ptr && record.obj->mesh_ptr->_txts) {
 		// has texture
@@ -138,6 +140,8 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 		col.e[1] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
 		col.e[2] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
 }
+#endif
+
 	return col;
 }
 
@@ -161,6 +165,8 @@ bool Scene::intersect(Ray& r, HitRecord& rec) {
 void Scene::setBackground(vec3f c) {
 	background = vec3f(c.r(), c.g(), c.b());
 }
+
+void Scene::addMesh(Mesh *m) { meshes.push_back(m); }
 
 void Scene::addShape(Shape* shape) { shapes.push_back(shape); }
 

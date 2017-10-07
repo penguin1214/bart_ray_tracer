@@ -21,16 +21,20 @@ public:
 	inline vec3f centroid();
 
 	float d[G_PLANE_SET_NORMAL_NUM][2];
-	std::shared_ptr<Mesh> _mesh_ptr;
+	Mesh *_mesh_ptr;
 };
 
 
-struct OctreeNode {
+class OctreeNode {
+public:
 	OctreeNode *children[8] = { nullptr };
 	std::vector<Extents *> extentsList;	// every node holds a set of extents inside it
 	Extents nodeExtent;
 	BBox *_bbox;	// bbox is only used in tree construction, cost memory, consider optimization.
 	bool _is_leaf = true;
+
+	OctreeNode();
+	~OctreeNode();
 };
 
 /* Octree instances hold a pointer to the root node,
@@ -41,6 +45,7 @@ public:
 	Octree();
 	~Octree();
 
+	void init();
 	void build();
 	void insert(Extents *ext);
 
@@ -60,7 +65,7 @@ private:
 class BVH {
 public:
 	BVH() : _octree(nullptr) {}
-	BVH(std::vector< std::shared_ptr<Mesh> > meshes);
+	BVH(std::vector<Mesh* > meshes);
 	~BVH();
 
 	// directly return a low-level intersect primitive

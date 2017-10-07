@@ -6,6 +6,7 @@
 #define BART_RAY_TRACER_TRANSFORM_H
 
 #include <vector>
+#include <memory>
 #include <stack>
 #include "matrix4x4.h"
 
@@ -20,16 +21,16 @@ public:
     //std::vector<TransformHierarchy*> _children;
 	TransformHierarchy *_child;
 
-    TransformHierarchy(bool is_s) : _is_static(is_s) {
-        _transformMatrix = Matrix4x4();
-        _parent = nullptr; _mesh = nullptr;
-    }
+	TransformHierarchy(bool is_s) : _is_static(is_s) {
+		_transformMatrix = Matrix4x4();
+		_parent = nullptr; _mesh = nullptr;
+	}
 
-    void addChild(TransformHierarchy* t) {
-        //_children.push_back(t);
+	void addChild(TransformHierarchy* t) {
+		//_children.push_back(t);
 		_child = t;
-        t->_parent = this;
-    }
+		t->_parent = this;
+	}
 };
 
 extern std::stack<TransformHierarchy*> transformHierarchy;

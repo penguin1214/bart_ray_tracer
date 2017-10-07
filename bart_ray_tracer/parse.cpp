@@ -524,6 +524,7 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *normals, int nnormals, Ve
 		mesh->addTriangle(tri);
 		rayTracer->scene->addShape(tri);
 	}
+	rayTracer->scene->addMesh(mesh);
 
 	if (txts) {
 		Texture *raw_texture = viReadPPM(textureName);
