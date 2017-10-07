@@ -9,14 +9,15 @@
 
 class Ray {
 public:
-    vec3f o;
-    vec3f d;
+	vec3f o;
+	vec3f d;
 
-    Ray() {}
-    Ray(const vec3f&a, const vec3f& b) :o(a), d(b){}
-    vec3f origin() const { return o; }
-    vec3f direction() const { return d; }
-    vec3f point_at_parameter(float t) const { return o+d*t; }
+	Ray() {}
+	Ray(const vec3f&a, const vec3f& b) :o(a), d(b) { d = unit(d); }
+	Ray(Ray &r) : o(r.o), d(r.d) {}
+	vec3f origin() const { return o; }
+	vec3f direction() const { return d; }
+	vec3f point_at_parameter(float t) const { return o+d*t; }
 };
 
 #endif //BART_RAY_TRACER_RAY_H

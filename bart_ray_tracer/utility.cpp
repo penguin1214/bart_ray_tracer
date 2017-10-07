@@ -4,7 +4,7 @@
 #include <iostream>
 #include <algorithm>
 
-#include "common.h"
+#include "core.h"
 
 float deg2rad(float degree) {
 	return degree*M_PI/180;

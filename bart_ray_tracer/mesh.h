@@ -9,7 +9,6 @@
 #include "assert.h"
 
 #include "core.h"
-#include "common.h"
 #include "transform.h"
 #include "matrix4x4.h"
 

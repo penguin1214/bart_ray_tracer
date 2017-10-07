@@ -39,30 +39,42 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 
 	}*/
 
+	float eps = 1e-4;	// bias to avoid numerical error
 	//////////////////////////////////////////////////////////////////////////
 	/// FIRST COMPUTE LOCAL ILLUMINATION
 	//////////////////////////////////////////////////////////////////////////
 	Light *light = lights[1];
-	// ambient
-	col += light->col * mat->ambient;
-	// diffuse
-	Ray r_scnd(record.p, unit(light->pos - record.p));
+	// use single-faced triangle,
+	// therefore shadow rays should point from light to intersection point.
+	Ray r_scnd(record.p + eps*record.norm, unit(light->pos - record.p));
+	// Ray r_scnd(record.p + eps*record.norm, record.p - light->pos);
 	HitRecord shadow_rec;
-	if (!intersect(r_scnd, shadow_rec)) return lights[0]->col;	// TODO if shadow, return ambient
-
-	float tmp_cos = dot(r_scnd.d, record.norm);
-	if (tmp_cos > 0) {
-		if (mat->diffuse.x() > 0 || mat->diffuse.y() > 0 || mat->diffuse.z() > 0) {
-			col += tmp_cos * mat->diffuse * light->col;
-		}
+	
+	if (intersect(r_scnd, shadow_rec)) {
+		// if shadowed, apply ambient color
+		col += lights[0]->col * mat->ambient;
 	}
+	else {
+		// Ray r_to_shadow(r_scnd.o, -r_scnd.d);	// counter direction to r_scnd
+		// ambient
+		col += light->col * mat->ambient;
 
-	// specular
-	vec3f v_view = unit(camera->from - record.p);
-	vec3f v_reflect = unit(reflect(record.norm, r.direction()));
-	tmp_cos = dot(v_reflect, v_view);
-	if (tmp_cos > 0.0) {
-		col += mat->specular * std::pow(std::max(float(0.0), tmp_cos), mat->shine) * light->col;
+		// diffuse
+		float tmp_cos = dot(r_scnd.d, record.norm);
+		if (tmp_cos > 0) {
+			if (mat->diffuse.x() > 0 || mat->diffuse.y() > 0 || mat->diffuse.z() > 0) {
+				col += tmp_cos * mat->diffuse * light->col;
+			}
+		}
+
+		// specular
+		vec3f v_view = unit(camera->from - record.p);
+		vec3f v_reflect = unit(reflect(record.norm, r.direction()));
+		tmp_cos = dot(v_reflect, v_view);
+		if (tmp_cos > 0.0) {
+			col += mat->specular * std::pow(std::max(float(0.0), tmp_cos), mat->shine) * light->col;
+		}
+
 	}
 
 	//std::cout << "local illu: " << col << std::endl;
@@ -70,8 +82,7 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 	/// THEN COMPUTE GLOBAL ILLUMINATION
 	/// RECURSIVELY CAST RAYS
 	//////////////////////////////////////////////////////////////////////////
-	float eps = 1e-4;	// bias to avoid numerical error
-						// reflectance
+	// reflectance
 	vec3f reflect_dir = reflect(record.norm, r.d);
 	Ray r_reflect(record.p + record.norm * eps, unit(reflect_dir));
 	//std::cout << "trace reflection" << std::endl;
@@ -126,7 +137,7 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 		col.e[0] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 0] / 255.0f;
 		col.e[1] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
 		col.e[2] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
-	}
+}
 	return col;
 }
 

@@ -13,12 +13,13 @@
 #include <cerrno>
 #include "parse.h"
 #include "kbsplpos.h"
+
+#include "core.h"
 #include "animation.h"
 #include "texture.h"
 #include "raytracer.h"
 #include "matrix4x4.h"
 #include "mesh.h"
-#include "common.h"
 #include "material.h"
 #include "shape.h"
 

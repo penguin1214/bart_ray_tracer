@@ -45,39 +45,71 @@ Triangle::Triangle(Mesh* m) {
 	mesh_ptr = m;
 }
 
-bool Triangle::intersect(Ray& r, HitRecord& rec) {
-	vec3f* verts = mesh_ptr->_verts_world;	// use world(transformed) coordinates!
-	float eps = 1e-4;   // less than 1e-4, then
-
-						// counter-clockwise
-	vec3f v0 = verts[vertexIndex[0]];
-	vec3f v1 = verts[vertexIndex[1]];
-	vec3f v2 = verts[vertexIndex[2]];
-
+// static
+bool Triangle::intersect(Ray &r, vec3f v0, vec3f v1, vec3f v2) {
+	float eps = 1e-6;
+	vec3f E1 = v1 - v0; vec3f E2 = v2 - v0;
 	// compute plane normal
-	vec3f n = -cross(v1 - v0, v2 - v0);
+	vec3f n = cross(v2 - v0, v1 - v0);	// order matters!
+	vec3f pvec = cross(r.d, E2);
+	float det = dot(E1, pvec);
 
-	vec3f v0v1 = v1 - v0; vec3f v0v2 = v2 - v0;
-	vec3f pvec = cross(r.d, v0v2);
-	float det = dot(v0v1, pvec);
-	// do not culling
+	// culling
+	if ((-det) < eps) return false;
 
-	if (std::fabs(det < eps)) return false;
+	// if (std::fabs(det < eps)) return false;
 
 	float invDet = 1.0 / det;
 	vec3f tvec = r.o - v0;
 	float u = dot(tvec, pvec) * invDet;
 	if (u < 0 || u > 1) return false;
 
-	vec3f qvec = cross(tvec, v0v1);
+	vec3f qvec = cross(tvec, E1);
 	float v = dot(r.d, qvec) * invDet;
 	if (v < 0 || u + v > 1) return false;
 
-	rec.t = dot(v0v2, qvec) * invDet;
+	float t = dot(E2, qvec) * invDet;
+
+	return true;
+}
+
+bool Triangle::intersect(Ray& r, HitRecord& rec) {
+	// ray direction is normalized
+	vec3f* verts = mesh_ptr->_verts_world;	// use world(transformed) coordinates!
+	float eps = 1e-6;   // less than 1e-4, then
+
+	// counter-clockwise
+	vec3f v0 = verts[vertexIndex[0]];
+	vec3f v1 = verts[vertexIndex[1]];
+	vec3f v2 = verts[vertexIndex[2]];
+
+	vec3f E1 = v1 - v0; vec3f E2 = v2 - v0;
+	// compute plane normal
+	vec3f n = cross(v2 - v0, v1 - v0);	// order matters!
+
+	vec3f pvec = cross(r.d, E2);
+	float det = dot(E1, pvec);
+
+	// culling
+	if ((-det) < eps) return false;
+
+	// if (std::fabs(det < eps)) return false;
+
+	float invDet = 1.0 / det;
+	vec3f tvec = r.o - v0;
+	float u = dot(tvec, pvec) * invDet;
+	if (u < 0 || u > 1) return false;
+
+	vec3f qvec = cross(tvec, E1);
+	float v = dot(r.d, qvec) * invDet; 
+ 	if (v < 0 || u + v > 1) return false;
+
+	rec.t = dot(E2, qvec) * invDet;
+	if (rec.t < 0.0) return false;
+
 	rec.p = r.origin() + rec.t*r.direction();
 	rec.obj = this;
 
-	// TODO: special treatment for normals!
 	if (!(mesh_ptr->_normals == NULL || mesh_ptr->nnorms == 0)) { // read-in normals
 																  // normal intersection
 																  // TODO
