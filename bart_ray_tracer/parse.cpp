@@ -501,7 +501,7 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *normals, int nnormals, Ve
 	if (t_top != NULL) {
 		t_top->_mesh = mesh;
 	}
-	mesh->material = &rawMaterial;
+	mesh->material = new Material(rawMaterial);
 	mesh->setMeshTransform(t_top);
 
 	for (int i = 0; i < ntris; ++i) {
@@ -1593,6 +1593,7 @@ bool viParseFile(FILE *f)
 				break;
 			case 'f':   /* fill material */
 				parseFill(f); /* ok */
+				std::cout << "parse [fill]" << std::endl;
 				break;
 			case 'c':   /* cylinder or cone */
 				parseCone(f); /* ok */
@@ -1614,9 +1615,11 @@ bool viParseFile(FILE *f)
 				break;
 			case 'x':  /* transform */
 				parseTransform(f);
+				std::cout << "parse [transform]" << std::endl;
 				break;
 			case '}':
 				viEndTransform();	// pop up transfom
+				std::cout << "end transform" << std::endl;
 				break;
 			case 'a':  /* animation parameters or ambient light */
 				parseA(f);
@@ -1626,6 +1629,7 @@ bool viParseFile(FILE *f)
 				break;
 			case 'm':  /* triangle mesh */
 				parseMesh(f);
+				std::cout << "parse [mesh]" << std::endl;
 				break;
 			default:    /* unknown */
 				printf("unknown NFF primitive code: %c\n",ch);

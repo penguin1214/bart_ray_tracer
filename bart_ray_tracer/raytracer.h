@@ -26,7 +26,7 @@ public:
 	float nframes;
 
 	RayTracer(char* f) : filename(f) {
-		nsample = 2;
+		nsample = 1;
 		scene = new Scene();
 		transformHierarchy.push(NULL);
 	}

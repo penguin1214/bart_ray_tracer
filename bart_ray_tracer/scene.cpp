@@ -31,7 +31,7 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 		return vec3f(0.0);
 	}
 
-	vec3f col(0.1);
+	vec3f col(0.0);
 	// handle intersect color
 	Material *mat = record.obj->material();
 
@@ -48,12 +48,13 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 	// use single-faced triangle,
 	// therefore shadow rays should point from light to intersection point.
 	Ray r_scnd(record.p + eps*record.norm, unit(light->pos - record.p));
-	// Ray r_scnd(record.p + eps*record.norm, record.p - light->pos);
+	// Ray r_scnd(record.p + eps*record.norm, record.p - light->pos); m, 
 	HitRecord shadow_rec;
 	
+	col += lights[0]->col * mat->ambient;
 	if (intersect(r_scnd, shadow_rec)) {
 		// if shadowed, apply ambient color
-		col += lights[0]->col * mat->ambient;
+		col += light->col * mat->ambient;
 	}
 	else {
 		// Ray r_to_shadow(r_scnd.o, -r_scnd.d);	// counter direction to r_scnd
@@ -73,6 +74,7 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 		vec3f v_reflect = unit(reflect(record.norm, r.direction()));
 		tmp_cos = dot(v_reflect, v_view);
 		if (tmp_cos > 0.0) {
+			// std::cout << tmp_cos << ", " << mat->shine << " -> " << std::pow(std::max(float(0.0), tmp_cos), mat->shine);
 			col += mat->specular * std::pow(std::max(float(0.0), tmp_cos), mat->shine) * light->col;
 		}
 
@@ -84,11 +86,12 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 	/// RECURSIVELY CAST RAYS
 	//////////////////////////////////////////////////////////////////////////
 	// reflectance
+#if 0
 	vec3f reflect_dir = reflect(record.norm, r.d);
 	Ray r_reflect(record.p + record.norm * eps, unit(reflect_dir));
 	//std::cout << "trace reflection" << std::endl;
 	vec3f col_r = trace(r_reflect, depth, incident_ior);
-	col += col_r * (1 - mat->T);
+	col += col_r * (1 - mat->T) * mat->specular;
 
 	// refraction
 	if (mat->T > 0.0) {	// do transmit
@@ -104,7 +107,7 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 		}
 	}
 
-#if 0
+#endif
 	// texture
 	if (record.obj->mesh_ptr && record.obj->mesh_ptr->_txts) {
 		// has texture
@@ -140,7 +143,6 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 		col.e[1] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
 		col.e[2] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
 }
-#endif
 
 	return col;
 }
@@ -176,7 +178,7 @@ void Scene::addLight(Light* l) { lights.push_back(l); }
 //////////////////////////////////////////////////////////////////////////
 /// TOOL FUNCTION
 vec3f reflect(const vec3f &normal, const vec3f &incident) {
-	vec3f b = dot(-incident, normal);
+	vec3f b = -normal * dot(incident, normal);
 	return unit(incident + 2 * b);
 }
 
