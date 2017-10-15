@@ -127,8 +127,6 @@
     <ClCompile Include="raytracer.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="shape.cpp" />
-    <ClCompile Include="test.cpp" />
-    <ClCompile Include="test.h" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="utility.cpp" />
   </ItemGroup>

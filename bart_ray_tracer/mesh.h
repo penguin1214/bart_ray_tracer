@@ -6,6 +6,7 @@
 #define BART_RAY_TRACER_MESH_H
 
 #include <vector>
+#include <string>
 #include "assert.h"
 
 #include "core.h"
@@ -24,6 +25,7 @@ class Mesh {
 public:
 	uint32_t nverts, nnorms, ntxts;
 	bool _is_static;
+	std::string _name;	// for animated mesh
 	vec3f *verts;
 	vec3f *_verts_world;
 	vec3f *_normals;

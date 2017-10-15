@@ -7,7 +7,7 @@
 
 float deg2rad(float degree);
 
-void writePPMBin(float *image, int size_x, int size_y, char *filename);
+void writePPMBin(float *image, int size_x, int size_y, const char *filename);
 void writePPMDec(float *image);
 
 void colorScale(float *image, int npixel);

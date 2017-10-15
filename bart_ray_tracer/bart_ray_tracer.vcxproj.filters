@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="tests">
-      <UniqueIdentifier>{bebecfa9-28a6-4241-ab21-d8fea7adaa76}</UniqueIdentifier>
-    </Filter>
     <Filter Include="io">
       <UniqueIdentifier>{9857656b-02b7-41df-a31f-aa0cc5e7009f}</UniqueIdentifier>
     </Filter>
@@ -34,12 +31,6 @@
     <ClCompile Include="parse.cpp">
       <Filter>io</Filter>
     </ClCompile>
-    <ClCompile Include="kbsplpos.c">
-      <Filter>misc</Filter>
-    </ClCompile>
-    <ClCompile Include="kbsplrot.c">
-      <Filter>misc</Filter>
-    </ClCompile>
     <ClCompile Include="shape.cpp">
       <Filter>primitive</Filter>
     </ClCompile>
@@ -55,11 +46,11 @@
     <ClCompile Include="animation.c">
       <Filter>misc</Filter>
     </ClCompile>
-    <ClCompile Include="test.h">
-      <Filter>tests</Filter>
+    <ClCompile Include="kbsplpos.c">
+      <Filter>io</Filter>
     </ClCompile>
-    <ClCompile Include="test.cpp">
-      <Filter>tests</Filter>
+    <ClCompile Include="kbsplrot.c">
+      <Filter>io</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -73,12 +64,6 @@
     <ClInclude Include="utility.h" />
     <ClInclude Include="parse.h">
       <Filter>io</Filter>
-    </ClInclude>
-    <ClInclude Include="kbsplpos.h">
-      <Filter>misc</Filter>
-    </ClInclude>
-    <ClInclude Include="kbsplrot.h">
-      <Filter>misc</Filter>
     </ClInclude>
     <ClInclude Include="matrix4x4.h">
       <Filter>math</Filter>
@@ -115,6 +100,12 @@
     </ClInclude>
     <ClInclude Include="animation.h">
       <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="kbsplpos.h">
+      <Filter>io</Filter>
+    </ClInclude>
+    <ClInclude Include="kbsplrot.h">
+      <Filter>io</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

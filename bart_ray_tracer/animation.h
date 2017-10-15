@@ -4,6 +4,11 @@
 		   This file contains all functions you need to get the animted
 		   transform out of an struct AnimationList
 ----------------------------------------------------------------------*/
+#ifdef __cplusplus
+#if __cplusplus
+extern "C" {
+#endif
+#endif /* __cplusplus */ 
 
 #ifndef ANIMATION_H
 #define ANIMATION_H
@@ -63,3 +68,9 @@ void GetCamera(struct AnimationList *al,double time,
 		   int *gotDirection, double viewDir[3], double viewUp[3]);
 
 #endif
+
+#ifdef __cplusplus
+#if __cplusplus
+}
+#endif
+#endif /* __cplusplus */ 
