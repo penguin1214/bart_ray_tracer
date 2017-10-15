@@ -4,13 +4,13 @@
 #include <iostream>
 #include <algorithm>
 
-#include "common.h"
+#include "core.h"
 
 float deg2rad(float degree) {
 	return degree*M_PI/180;
 }
 
-void writePPMBin(float *image, int size_x, int size_y, char *filename) {
+void writePPMBin(float *image, int size_x, int size_y, const char *filename) {
 	std::ofstream ofs(filename, std::ios::out | std::ios::binary);
 	ofs << "P6\n" << size_x << " " << size_y << "\n255\n";
 	for (int j = 0; j < size_y; j++)  // loop over pixels, write RGB values

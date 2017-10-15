@@ -1,132 +1,111 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="io">
+      <UniqueIdentifier>{9857656b-02b7-41df-a31f-aa0cc5e7009f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="misc">
+      <UniqueIdentifier>{bf3cda00-8486-4131-9563-9fed0d7d2902}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="math">
+      <UniqueIdentifier>{2b67c294-de72-4740-83b4-e17b11beaec6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Accelarator">
+    <Filter Include="primitive">
+      <UniqueIdentifier>{3f9cf986-05e7-4d55-abfb-b3b4570154ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="accelarator">
       <UniqueIdentifier>{3fc0f47f-88fc-4d26-9ca5-75ad54330381}</UniqueIdentifier>
     </Filter>
+    <Filter Include="scene">
+      <UniqueIdentifier>{3079981b-d7f3-4ed8-978d-43d9530f8264}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="animation.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="kbsplpos.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="kbsplrot.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="parse.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="quat.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="raytracer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="utility.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="bvh.cpp">
-      <Filter>Header Files\Accelarator</Filter>
+      <Filter>accelarator</Filter>
     </ClCompile>
-    <ClCompile Include="mesh.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="raytracer.cpp" />
+    <ClCompile Include="texture.cpp" />
+    <ClCompile Include="utility.cpp" />
+    <ClCompile Include="parse.cpp">
+      <Filter>io</Filter>
     </ClCompile>
     <ClCompile Include="shape.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="quat.c">
+      <Filter>primitive</Filter>
+    </ClCompile>
+    <ClCompile Include="scene.cpp">
+      <Filter>scene</Filter>
+    </ClCompile>
+    <ClCompile Include="animation.c">
+      <Filter>misc</Filter>
+    </ClCompile>
+    <ClCompile Include="kbsplpos.c">
+      <Filter>io</Filter>
+    </ClCompile>
+    <ClCompile Include="kbsplrot.c">
+      <Filter>io</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="animation.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="bvh.h">
+      <Filter>accelarator</Filter>
     </ClInclude>
-    <ClInclude Include="camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="film.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="kbsplpos.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="kbsplrot.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="light.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="material.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="core.h" />
+    <ClInclude Include="material.h" />
+    <ClInclude Include="raytracer.h" />
+    <ClInclude Include="texture.h" />
+    <ClInclude Include="utility.h" />
+    <ClInclude Include="parse.h">
+      <Filter>io</Filter>
     </ClInclude>
     <ClInclude Include="matrix4x4.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="parse.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="quat.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ray.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="raytracer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="shape.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="transform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="utility.h">
-      <Filter>Header Files</Filter>
+      <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="vec3f.h">
-      <Filter>Header Files</Filter>
+      <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="common.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="transform.h">
+      <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="core.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="shape.h">
+      <Filter>primitive</Filter>
     </ClInclude>
-    <ClInclude Include="bvh.h">
-      <Filter>Header Files\Accelarator</Filter>
+    <ClInclude Include="mesh.h">
+      <Filter>primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="quat.h">
+      <Filter>primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="film.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="light.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="ray.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>scene</Filter>
+    </ClInclude>
+    <ClInclude Include="animation.h">
+      <Filter>misc</Filter>
+    </ClInclude>
+    <ClInclude Include="kbsplpos.h">
+      <Filter>io</Filter>
+    </ClInclude>
+    <ClInclude Include="kbsplrot.h">
+      <Filter>io</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

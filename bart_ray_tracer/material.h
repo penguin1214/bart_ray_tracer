@@ -18,6 +18,10 @@ public:
 	float ior;
 
 	Material() : ambient(), diffuse(), specular(), reflect(0.1), shine(0), T(1), ior(0) {}
+	Material(Material &m) {
+		this->ambient = m.ambient; this->diffuse = m.diffuse; this->specular = m.specular; this->reflect = m.reflect;
+		this->shine = m.shine; this->T = m.T; this->ior = m.ior;
+	}
 
 	inline void setAmbient(vec3f amb) { ambient = amb; }
 	inline void setDiffuse(vec3f diff) { diffuse = diff; }

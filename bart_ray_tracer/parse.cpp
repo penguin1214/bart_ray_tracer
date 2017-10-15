@@ -12,13 +12,18 @@
 #include <cassert>
 #include <cerrno>
 #include "parse.h"
+
+extern "C" {
 #include "kbsplpos.h"
+#include "kbsplrot.h"
+}
+
+#include "core.h"
 #include "animation.h"
 #include "texture.h"
 #include "raytracer.h"
 #include "matrix4x4.h"
 #include "mesh.h"
-#include "common.h"
 #include "material.h"
 #include "shape.h"
 
@@ -500,8 +505,9 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *normals, int nnormals, Ve
 	if (t_top != NULL) {
 		t_top->_mesh = mesh;
 	}
-	mesh->material = &rawMaterial;
+	mesh->material = new Material(rawMaterial);
 	mesh->setMeshTransform(t_top);
+
 
 	for (int i = 0; i < ntris; ++i) {
 		Triangle* tri = new Triangle(mesh);	// create triangle and bind mesh pointer
@@ -523,6 +529,7 @@ static void viAddMesh(vec3f* verts, int nverts, vec3f *normals, int nnormals, Ve
 		mesh->addTriangle(tri);
 		rayTracer->scene->addShape(tri);
 	}
+	rayTracer->scene->addMesh(mesh);	// ani/non-ani is handled inside addMesh()
 
 	if (txts) {
 		Texture *raw_texture = viReadPPM(textureName);
@@ -1021,7 +1028,8 @@ static void parseKeyFrames(FILE *fp)
 	int  c;
 	int visibility;
 	int  ret, i, nKeyFrames;
-	float time, x, y, z, angle, te, co, bi;
+	// tension, continuity, and bias, are the constants for interpolation at time
+	float time, x, y, z, angle, te/*tension*/, co/*continuity*/, bi/*bias*/;
 	PositionKey* PKeys;
 	RotationKey* RKeys;
 	Animation* animation;
@@ -1029,8 +1037,9 @@ static void parseKeyFrames(FILE *fp)
 
 	// initialization
 	animationlist = (struct AnimationList*)calloc(1, sizeof(struct AnimationList));
-	animationlist->next = rayTracer->scene->gAnimations;
-	rayTracer->scene->gAnimations = animationlist;
+	// insert animation list to scene
+	animationlist->next = rayTracer->scene->animations;
+	rayTracer->scene->animations = animationlist;
 	animation = &(animationlist->animation);
 
 	if(fscanf(fp,"%s",name)!=1)
@@ -1102,8 +1111,7 @@ static void parseKeyFrames(FILE *fp)
 				PKeys[i].continuity = co;
 				PKeys[i].bias = bi;
 			}
-			/* TODO */
-			//animation->translations = KB_PosInitialize(nKeyFrames, PKeys);
+			animation->translations = KB_PosInitialize(nKeyFrames, PKeys);
 			free(PKeys);
 		}
 		else if(strcmp(motion, "rot")==0)
@@ -1128,8 +1136,7 @@ static void parseKeyFrames(FILE *fp)
 				RKeys[i].continuity = co;
 				RKeys[i].bias = bi;
 			}
-			/* TODO */
-			//animation->rotations = KB_RotInitialize(nKeyFrames, RKeys);
+			animation->rotations = KB_RotInitialize(nKeyFrames, RKeys);
 			free(RKeys);
 		}
 		else if(strcmp(motion, "scale")==0)
@@ -1153,8 +1160,7 @@ static void parseKeyFrames(FILE *fp)
 				PKeys[i].continuity = co;
 				PKeys[i].bias = bi;
 			}
-			/* TODO */
-			//animation->scales = KB_PosInitialize(nKeyFrames, PKeys);
+			animation->scales = KB_PosInitialize(nKeyFrames, PKeys);
 			free(PKeys);
 		}
 		else if(strcmp(motion, "visibility")==0)
@@ -1193,6 +1199,18 @@ static void viAddStaticTransform(vec3f s,vec3f rot,float deg,vec3f trans) {
 	m *= rotate(rot.e[0], rot.e[1], rot.e[2], deg);
 	m *= scale(s.e[0], s.e[1], s.e[2]);
 	new_child->_transformMatrix = m;
+
+#if 0
+	// if xs belongs to an animated transform, add name
+	TransformHierarchy *tb = transformHierarchy.top();
+	while (tb != NULL) {
+		for (int i = 0; i < transformHierarchy.size()-1; i++) {
+			tb = tb->_parent;
+		}
+	}
+	if (!tb->_is_static) new_child->_name = tb->_name;	// belongs to animated transform
+#endif
+
 	TransformHierarchy *tp = transformHierarchy.top();
 	if (tp != NULL) {
 		tp->addChild(new_child);	// if this transform is the top transform, it only has child.
@@ -1200,9 +1218,17 @@ static void viAddStaticTransform(vec3f s,vec3f rot,float deg,vec3f trans) {
 	transformHierarchy.push(new_child);
 }
 
+/* add animated transform */
 static void viAddTransform(char* name) {
-	/* TODO: transform */
+	/// animated transforms are set in keyframes.
 	TransformHierarchy* new_child = new TransformHierarchy(false);
+	new_child->_name = name;	/// char* => string?
+	TransformHierarchy* t = transformHierarchy.top();
+	if (t != nullptr) {
+		// has previous transforms, just add child.
+		t->addChild(new_child);
+	}
+	rayTracer->scene->addXform(new_child);
 	transformHierarchy.push(new_child);
 }
 
@@ -1325,9 +1351,7 @@ static void parseAnimParams(FILE *fp)
 		printf("Error: could not parse animations parameters.\n");
 		exit(1);
 	}
-	/* TODO: add animations parameters here
-	 * e.g., viSetupAnimParams(start,end,num_frames);
-	 */
+
 	viSetupAnimParams(start, end, num_frames);
 }
 
@@ -1591,6 +1615,7 @@ bool viParseFile(FILE *f)
 				break;
 			case 'f':   /* fill material */
 				parseFill(f); /* ok */
+				std::cout << "parse [fill]" << std::endl;
 				break;
 			case 'c':   /* cylinder or cone */
 				parseCone(f); /* ok */
@@ -1612,9 +1637,11 @@ bool viParseFile(FILE *f)
 				break;
 			case 'x':  /* transform */
 				parseTransform(f);
+				std::cout << "parse [transform]" << std::endl;
 				break;
 			case '}':
 				viEndTransform();	// pop up transfom
+				std::cout << "end transform" << std::endl;
 				break;
 			case 'a':  /* animation parameters or ambient light */
 				parseA(f);
@@ -1624,6 +1651,7 @@ bool viParseFile(FILE *f)
 				break;
 			case 'm':  /* triangle mesh */
 				parseMesh(f);
+				std::cout << "parse [mesh]" << std::endl;
 				break;
 			default:    /* unknown */
 				printf("unknown NFF primitive code: %c\n",ch);

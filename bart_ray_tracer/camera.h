@@ -58,8 +58,6 @@ public:
 	}
 
 	Ray get_ray(float u, float v) {
-		//std::cout << "from: " << from << std::endl;
-		//std::cout << "cursor: " << lower_left_corner + u*horizontal + v*vertical;
 		return Ray(from, unit(up_left_corner+u*horizontal-v*vertical-from));
 	}
 };

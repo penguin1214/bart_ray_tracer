@@ -63,6 +63,8 @@ void Mesh::setMeshTransform(TransformHierarchy* trans) {
 		if (!t_tmp->_is_static) {
 			// mesh is not static
 			_is_static = false;
+			_name = t_tmp->_name;
+			_trans_local_to_world_inv = _trans_local_to_world.inverse();
 			return; // must return!
 		}
 		/* TODO: world transform? */

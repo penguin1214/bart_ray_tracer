@@ -1,15 +1,17 @@
 #include "bvh.h"
+
+#include <math.h>
+
 #include "shape.h"
 #include "mesh.h"
 #include "ray.h"
-
 
 //////////////////////////////////////////////////////////////////////////
 /// class Extents
 //////////////////////////////////////////////////////////////////////////
 Extents::Extents() {
 	for (int i = 0; i < G_PLANE_SET_NORMAL_NUM; i++) {
-		d[i][0] = -INFINITY; d[i][1] = INFINITY;
+		d[i][0] = INFINITY; d[i][1] = -INFINITY;
 	}
 }
 
@@ -46,10 +48,17 @@ vec3f Extents::centroid() {
 }
 
 //////////////////////////////////////////////////////////////////////////
+/// class OctreeNode
+//////////////////////////////////////////////////////////////////////////
+OctreeNode::OctreeNode() { _bbox = new BBox(); }
+
+OctreeNode::~OctreeNode() {}
+//////////////////////////////////////////////////////////////////////////
 /// class Octree
 //////////////////////////////////////////////////////////////////////////
 Octree::Octree() { _root = nullptr; }
 Octree::~Octree() { deleteOctree(_root); }
+void Octree::init() { _root = new OctreeNode(); }
 void Octree::build() { build(_root); }
 void Octree::insert(Extents *ext) { insert(_root, ext, 0); }
 
@@ -61,66 +70,140 @@ void Octree::insert(OctreeNode *node, Extents *ext, int node_depth) {
 	//		if ext within child ext
 	//			child.insert(ext)
 	// recursive...
+
+	if (node_depth == _max_depth) {
+		// just add extents
+		node->extentsList.push_back(ext);
+	}
+	else {
+		// not max depth
+		if (node->extentsList.size() == 0) {
+			// not occupied yet, insert
+			node->extentsList.push_back(ext);
+			// compute bbox for child node
+
+		}
+		else {
+			// already occupied
+			// split
+			for (int i = 0; i < 8; i++) {
+				node->children[i] = new OctreeNode();
+
+				BBox child_bbox;
+				vec3f ext_centroid = ext->centroid();
+				vec3f node_centroid = node->nodeExtent.centroid();
+				int insert_idx = 0;
+				// x-axis
+				if (ext_centroid.x() > node_centroid.x()) {
+					// right side
+					insert_idx = 4;
+					child_bbox.p_min.e[0] = (node->_bbox->p_min.e[0] + node->_bbox->p_max.e[0]) / 2.0;
+					child_bbox.p_max.e[0] = node->_bbox->p_max.e[0];
+				}
+				else {
+					// left side
+					child_bbox.p_min.e[0] = node->_bbox->p_min.e[0];
+					child_bbox.p_max.e[0] = (node->_bbox->p_min.e[0] + node->_bbox->p_max.e[0]) / 2.0;
+				}
+				// y-axis
+				if (ext_centroid.y() > node_centroid.y()) {
+					// up side
+					insert_idx += 2;
+					child_bbox.p_min.e[1] = (node->_bbox->p_min.e[1] + node->_bbox->p_max.e[1]) / 2.0;
+					child_bbox.p_max.e[1] = node->_bbox->p_max.e[1];
+				}
+				else {
+					// down side
+					child_bbox.p_min.e[1] = node->_bbox->p_min.e[1];
+					child_bbox.p_max.e[1] = (node->_bbox->p_min.e[1] + node->_bbox->p_max.e[1]) / 2.0;
+				}
+				// z-axis
+				if (ext_centroid.z() > node_centroid.z()) {
+					// far side
+					insert_idx += 1;
+					child_bbox.p_min.e[2] = (node->_bbox->p_min.e[2] + node->_bbox->p_max.e[2]) / 2.0;
+					child_bbox.p_max.e[2] = node->_bbox->p_max.e[2];
+				}
+				else {
+					// near side
+					child_bbox.p_min.e[2] = node->_bbox->p_min.e[2];
+					child_bbox.p_max.e[2] = (node->_bbox->p_min.e[2] + node->_bbox->p_max.e[2]) / 2.0;
+				}
+			}
+
+		}
+	}
+#if 0
 	if (node->_is_leaf) {
 		if (node->extentsList.size() == 0 || node_depth == _max_depth) {
 			node->extentsList.push_back(ext);
 		}
 		else {
-			// split node and RE-INSERT!
-			node->_is_leaf = false;
-			insert(node, node->extentsList.back(), node_depth);
-			node->extentsList.pop_back();
+			// has children
+			// set inserted node's box and split node
+			BBox child_bbox;
+			vec3f ext_centroid = ext->centroid();
+			vec3f node_centroid = node->nodeExtent.centroid();
+			int insert_idx = 0;
+			// x-axis
+			if (ext_centroid.x() > node_centroid.x()) {
+				// right side
+				insert_idx = 4;
+				child_bbox.p_min.e[0] = (node->_bbox->p_min.e[0] + node->_bbox->p_max.e[0]) / 2.0;
+				child_bbox.p_max.e[0] = node->_bbox->p_max.e[0];
+			}
+			else {
+				// left side
+				child_bbox.p_min.e[0] = node->_bbox->p_min.e[0];
+				child_bbox.p_max.e[0] = (node->_bbox->p_min.e[0] + node->_bbox->p_max.e[0]) / 2.0;
+			}
+			// y-axis
+			if (ext_centroid.y() > node_centroid.y()) {
+				// up side
+				insert_idx += 2;
+				child_bbox.p_min.e[1] = (node->_bbox->p_min.e[1] + node->_bbox->p_max.e[1]) / 2.0;
+				child_bbox.p_max.e[1] = node->_bbox->p_max.e[1];
+			}
+			else {
+				// down side
+				child_bbox.p_min.e[1] = node->_bbox->p_min.e[1];
+				child_bbox.p_max.e[1] = (node->_bbox->p_min.e[1] + node->_bbox->p_max.e[1]) / 2.0;
+			}
+			// z-axis
+			if (ext_centroid.z() > node_centroid.z()) {
+				// far side
+				insert_idx += 1;
+				child_bbox.p_min.e[2] = (node->_bbox->p_min.e[2] + node->_bbox->p_max.e[2]) / 2.0;
+				child_bbox.p_max.e[2] = node->_bbox->p_max.e[2];
+			}
+			else {
+				// near side
+				child_bbox.p_min.e[2] = node->_bbox->p_min.e[2];
+				child_bbox.p_max.e[2] = (node->_bbox->p_min.e[2] + node->_bbox->p_max.e[2]) / 2.0;
+			}
+
+			// do insert
+			if (node->children[insert_idx] == nullptr) node->children[insert_idx] = new OctreeNode();
+			node->children[insert_idx]->_bbox = &child_bbox;
+			std::cout << node_depth << std::endl;
+			insert(node->children[insert_idx], ext, node_depth + 1);
 		}
 		insert(node, ext, node_depth);
 	}
 	else {
-		// has children
-		BBox child_bbox;
-		vec3f ext_centroid = ext->centroid();
-		vec3f node_centroid = node->nodeExtent.centroid();
-		int insert_idx = 0;
-		// x-axis
-		if (ext_centroid.x() > node_centroid.x()) {
-			// right side
-			insert_idx = 4;
-			child_bbox.p_min.e[0] = (node->_bbox->p_min.e[0] + node->_bbox->p_max.e[0]) / 2.0;
-			child_bbox.p_max.e[0] = node->_bbox->p_max.e[0];
+		// reach depth
+		if (node->extentsList.size() == 0) {
+			// add done
+			node->_is_leaf = true;	// fix
 		}
 		else {
-			// left side
-			child_bbox.p_min.e[0] = node->_bbox->p_min.e[0];
-			child_bbox.p_max.e[0] = (node->_bbox->p_min.e[0] + node->_bbox->p_max.e[0]) / 2.0;
+			node->_is_leaf = false;
+			insert(node, node->extentsList.back(), node_depth);
+			node->extentsList.pop_back();
 		}
-		// y-axis
-		if (ext_centroid.y() > node_centroid.y()) {
-			// up side
-			insert_idx += 2;
-			child_bbox.p_min.e[1] = (node->_bbox->p_min.e[1] + node->_bbox->p_max.e[1]) / 2.0;
-			child_bbox.p_max.e[1] = node->_bbox->p_max.e[1];
-		}
-		else {
-			// down side
-			child_bbox.p_min.e[1] = node->_bbox->p_min.e[1];
-			child_bbox.p_max.e[1] = (node->_bbox->p_min.e[1] + node->_bbox->p_max.e[1]) / 2.0;
-		}
-		// z-axis
-		if (ext_centroid.z() > node_centroid.z()) {
-			// far side
-			insert_idx += 1;
-			child_bbox.p_min.e[2] = (node->_bbox->p_min.e[2] + node->_bbox->p_max.e[2]) / 2.0;
-			child_bbox.p_max.e[2] = node->_bbox->p_max.e[2];
-		}
-		else {
-			// near side
-			child_bbox.p_min.e[2] = node->_bbox->p_min.e[2];
-			child_bbox.p_max.e[2] = (node->_bbox->p_min.e[2] + node->_bbox->p_max.e[2]) / 2.0;
-		}
-
-		// do insert
-		if (node->children[insert_idx] == nullptr) node->children[insert_idx] = new OctreeNode;
-		node->children[insert_idx]->_bbox = &child_bbox;
-		insert(node->children[insert_idx], ext, node_depth + 1);
 	}
+
+#endif
 }
 
 void Octree::deleteOctree(OctreeNode *node) {
@@ -163,8 +246,12 @@ const vec3f BVH::_plane_set_normals[BVH::n_plane_set_normal] = {
 	vec3f(sqrtf(3) / 3.f, -sqrtf(3) / 3.f, sqrtf(3) / 3.f)
 };
 
-BVH::BVH(std::vector< std::shared_ptr<Mesh> > meshes) {
+BVH::BVH(std::vector<Mesh* > meshes) {
+	std::cout << "Initializing BVH tree..." << std::endl;
 	_extents.reserve(meshes.size());
+	for (int i = 0; i < meshes.size(); i++) {
+		_extents.push_back(new Extents);
+	}
 
 	for (int i = 0; i < meshes.size(); i++) {
 		for (int j = 0; j < n_plane_set_normal; j++) {
@@ -176,12 +263,14 @@ BVH::BVH(std::vector< std::shared_ptr<Mesh> > meshes) {
 
 	// TODO: compute bbox for root node, do not use extent
 	_octree = new Octree();
+	_octree->init();
 
 	for (int i = 0; i < meshes.size(); i++) {
 		// recursively insert node
 		_octree->insert(_extents[i]);
 	}
 
+	std::cout << "Initialization done. Updating BVH..." << std::endl;
 	// build from bottom up
 	_octree->build();
 }

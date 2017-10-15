@@ -5,6 +5,7 @@
 #ifndef BART_RAY_TRACER_SHAPE_H
 #define BART_RAY_TRACER_SHAPE_H
 
+#include <memory>
 #include <math.h>
 
 #include "core.h"
@@ -57,6 +58,7 @@ public:
 	Triangle();
 	Triangle(Mesh* m);
 
+	static bool intersect(Ray &r, vec3f v0, vec3f v1, vec3f v2);
 	bool intersect(Ray& r, HitRecord& rec);
 	Material* material();
 	void setVertexIndex(unsigned int i0, unsigned int i1, unsigned int i2);

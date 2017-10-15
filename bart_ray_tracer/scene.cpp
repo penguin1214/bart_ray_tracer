@@ -3,12 +3,14 @@
 #include "material.h"
 #include "mesh.h"
 #include "texture.h"
+#include "animation.h"
 
 //////////////////////////////////////////////////////////////////////////
 /// class Scene
 //////////////////////////////////////////////////////////////////////////
 Scene::Scene() {
-	gAnimations = NULL;
+	animations = NULL;
+	bvh = nullptr;
 	camera = new Camera();
 	background = vec3f(0.0);
 }
@@ -39,30 +41,44 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 
 	}*/
 
+	float eps = 1e-4;	// bias to avoid numerical error
 	//////////////////////////////////////////////////////////////////////////
 	/// FIRST COMPUTE LOCAL ILLUMINATION
 	//////////////////////////////////////////////////////////////////////////
 	Light *light = lights[1];
-	// ambient
-	col += light->col * mat->ambient;
-	// diffuse
-	Ray r_scnd(record.p, unit(light->pos - record.p));
+	// use single-faced triangle,
+	// therefore shadow rays should point from light to intersection point.
+	Ray r_scnd(record.p + eps*record.norm, unit(light->pos - record.p));
+	// Ray r_scnd(record.p + eps*record.norm, record.p - light->pos); m, 
 	HitRecord shadow_rec;
-	if (!intersect(r_scnd, shadow_rec)) return lights[0]->col;	// TODO if shadow, return ambient
 
-	float tmp_cos = dot(r_scnd.d, record.norm);
-	if (tmp_cos > 0) {
-		if (mat->diffuse.x() > 0 || mat->diffuse.y() > 0 || mat->diffuse.z() > 0) {
-			col += tmp_cos * mat->diffuse * light->col;
-		}
+	col += lights[0]->col * mat->ambient;
+	if (intersect(r_scnd, shadow_rec)) {	/// TODO: maxT?
+		// if shadowed, apply ambient color
+		col += light->col * mat->ambient;
 	}
+	else {
+		// Ray r_to_shadow(r_scnd.o, -r_scnd.d);	// counter direction to r_scnd
+		// ambient
+		col += light->col * mat->ambient;
 
-	// specular
-	vec3f v_view = unit(camera->from - record.p);
-	vec3f v_reflect = unit(reflect(record.norm, r.direction()));
-	tmp_cos = dot(v_reflect, v_view);
-	if (tmp_cos > 0.0) {
-		col += mat->specular * std::pow(std::max(float(0.0), tmp_cos), mat->shine) * light->col;
+		// diffuse
+		float tmp_cos = dot(r_scnd.d, record.norm);
+		if (tmp_cos > 0) {
+			if (mat->diffuse.x() > 0 || mat->diffuse.y() > 0 || mat->diffuse.z() > 0) {
+				col += tmp_cos * mat->diffuse * light->col;
+			}
+		}
+
+		// specular
+		vec3f v_view = unit(camera->from - record.p);
+		vec3f v_reflect = unit(reflect(record.norm, r.direction()));
+		tmp_cos = dot(v_reflect, v_view);
+		if (tmp_cos > 0.0) {
+			// std::cout << tmp_cos << ", " << mat->shine << " -> " << std::pow(std::max(float(0.0), tmp_cos), mat->shine);
+			col += mat->specular * std::pow(std::max(float(0.0), tmp_cos), mat->shine) * light->col;
+		}
+
 	}
 
 	//std::cout << "local illu: " << col << std::endl;
@@ -70,13 +86,12 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 	/// THEN COMPUTE GLOBAL ILLUMINATION
 	/// RECURSIVELY CAST RAYS
 	//////////////////////////////////////////////////////////////////////////
-	float eps = 1e-4;	// bias to avoid numerical error
-						// reflectance
+	// reflectance
 	vec3f reflect_dir = reflect(record.norm, r.d);
 	Ray r_reflect(record.p + record.norm * eps, unit(reflect_dir));
 	//std::cout << "trace reflection" << std::endl;
 	vec3f col_r = trace(r_reflect, depth, incident_ior);
-	col += col_r * (1 - mat->T);
+	col += col_r * (1 - mat->T) * mat->specular;
 
 	// refraction
 	if (mat->T > 0.0) {	// do transmit
@@ -127,6 +142,7 @@ vec3f Scene::trace(Ray& r, int depth, float incident_ior) {
 		col.e[1] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 1] / 255.0f;
 		col.e[2] *= (float)tri->mesh_ptr->texture->mRGB[tmp_idx + 2] / 255.0f;
 	}
+
 	return col;
 }
 
@@ -147,19 +163,70 @@ bool Scene::intersect(Ray& r, HitRecord& rec) {
 	}
 }
 
+/* update xform for every frame */
+void Scene::update(float time) {
+	// for every animation
+	AnimationList *alist;
+	Animation *ani;
+	double trans[3]; double rot[4]; double scl[3];
+	for (alist = animations; alist != NULL; alist = alist->next) {
+		// get animation
+		ani = &alist->animation;
+		// get corresponding transforms
+		_GetTranslation(ani, time, trans);
+		_GetRotation(ani, time, rot);
+		_GetScale(ani, time, scl);
+
+		if (strcmp(ani->name, "camera") == 0) {
+			/// TODO: camera animation
+			Matrix4x4 m;
+			m.identity();
+			m *= translate(trans[0], trans[1], trans[2]);
+			camera->from = m * camera->from;
+			m.identity();
+			m *= rotate(rot[0], rot[1], rot[2], rot[3]);
+			camera->at = m * camera->at;
+			camera->setCamParam(camera->from, camera->at, camera->up, camera->vfov);
+		}
+		else {
+			// update transforms
+			auto itr = xforms.find(ani->name);	// get iterator to transforms
+			TransformHierarchy *t = itr->second;
+			t->animate(trans, rot, scl);	// update xform named [name] at time [time]
+
+			// update mesh coordinates
+			for (auto itr = ani_meshes.begin(); itr != ani_meshes.end(); itr++) {
+				if ((*itr)->_name == ani->name) {
+					(*itr)->_trans_local_to_world *= t->_transformMatrix;
+				}
+			}
+		}
+	}
+}
+
 void Scene::setBackground(vec3f c) {
 	background = vec3f(c.r(), c.g(), c.b());
+}
+
+void Scene::addMesh(Mesh *m) {
+	if (m->_is_static)
+		meshes.push_back(m);
+	else
+		ani_meshes.push_back(m);
 }
 
 void Scene::addShape(Shape* shape) { shapes.push_back(shape); }
 
 void Scene::addLight(Light* l) { lights.push_back(l); }
 
+void Scene::addXform(TransformHierarchy* t) {
+	xforms.insert(std::pair<std::string, TransformHierarchy*>(t->_name, t));
+}
 
 //////////////////////////////////////////////////////////////////////////
 /// TOOL FUNCTION
 vec3f reflect(const vec3f &normal, const vec3f &incident) {
-	vec3f b = dot(-incident, normal);
+	vec3f b = -normal * dot(incident, normal);
 	return unit(incident + 2 * b);
 }
 

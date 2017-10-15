@@ -1,3 +1,6 @@
+/*
+ * BART ray tracer uses **single-faced** triangles!
+ */
 #include <iostream>
 #include "raytracer.h"
 #include "parse.h"
@@ -7,14 +10,13 @@
 RayTracer* rayTracer;
 std::stack<TransformHierarchy* >transformHierarchy;
 
-
 int main(int argc, char** argv) {
 	_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF);
 	/*if (argc!=2) {
 		std::cerr << argv[0] << " <file_name>." << std::endl;
 		return -1;
 	}*/
-	std::string str_filename = "test.aff";
+	std::string str_filename = "kitchen.aff";
 	char filename[1024];
 	strncpy(filename, str_filename.c_str(), sizeof(filename));
 	filename[sizeof(filename) - 1] = 0;
@@ -41,12 +43,10 @@ int main(int argc, char** argv) {
 		std::cout << "Parse file failed." << std::endl;
 	}
 
-	float *image = new float[3 * rayTracer->scene->camera->film->height*rayTracer->scene->camera->film->width];
-	char *ofname = "image.ppm";
-	rayTracer->render(image);
-	// do scale
-	colorScale(image, rayTracer->scene->camera->film->height*rayTracer->scene->camera->film->width);
-	writePPMBin(image, rayTracer->scene->camera->film->width, rayTracer->scene->camera->film->height, ofname);
+
+	rayTracer->init();
+	rayTracer->render();
+
 
 	int tm;
 	std::cin >> tm;
